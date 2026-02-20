@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../api";
 import { User, Scale, Calendar, ChevronRight, Check, Trash2, Leaf, AlertCircle, Utensils, Zap, Activity as ActivityIcon, Target, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,6 +45,13 @@ export default function ProfilePage({ profile, onSave }) {
     dietary_restrictions: [], allergens_to_avoid: [], cuisine_preferences: [],
     region: "global",
   });
+
+  // Sync form with profile prop changes (e.g., when loaded from backend)
+  useEffect(() => {
+    if (profile) {
+      setForm(p => ({ ...p, ...profile }));
+    }
+  }, [profile]);
   const [nutrition, setNutrition] = useState(null);
   const [loading, setLoading]  = useState(false);
   const [error, setError]      = useState("");

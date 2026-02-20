@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, NavLink, useNavigate } from "react-router-dom";
 import { User, BarChart3, Search, Calendar as CalendarIcon, LogOut } from "lucide-react";
 import "./index.css";

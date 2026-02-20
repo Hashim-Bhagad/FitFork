@@ -21,9 +21,13 @@ Traditional meal planners rely on rigid templates. **FitFork** treats nutrition 
 FitFork features a **premium dark botanical aesthetic**. Designed for the modern kitchen, the high-contrast "Deep Olive & Cream" palette ensures readability in low-light environments while maintaining a grounded, sophisticated feel.
 
 ```carousel
-![Premium Landing Page](https://lh3.googleusercontent.com/aida/AOfcidUYJPapx9xQKmv-gOdlRvgTQ_EDJ_Ca_7--ur9X549tQGzhoJ8kqzfFsMWjVd4mTHoagfqs1Z4DgQdiGDfGm1jbfdM27VeHxcdsOThJ5CP9CF_b8BJD7HMfIbL3olDcYB-7OdyL-md_uFuqzFsEt_7NWkuar-62Tpc1OMW2l1sGXiO68wHFUJkfsZ76v93feCd4iSWR9BhcWubS21uwMZVGPA_brQns36uwUe5RXjiJyA0dBv5_sloxkDox)
+![FitFork Dashboard](snapshots/image.png)
 <!-- slide -->
-![Metabolic Profile Management](https://lh3.googleusercontent.com/aida/AOfcidW9oWrPk46cqJkdEK5K6k00wEpZH-UvDsnWLRxg3031tiMzn9DZ0eZdml9uSnrbtqihn3YQevFjtNXjO9Kvpagfh9MUsDOORPbqvBTmF5gpmq6vR5w6LzOuQaOZf-faENL-T9o9fqyGPhIPQGV0NLjPh7WgGGgpbz--kyHLqilBsd_of7SEW5zlFZ4y-Jl090BPqF6HacuFmZrzlYWONFyDtTyq3UuRSQuPkZo6M49k_CpRv1JaL_BT2aO4)
+![Recipe View](snapshots/image%20copy.png)
+<!-- slide -->
+![Metabolic Profile](snapshots/image%20copy%202.png)
+<!-- slide -->
+![Meal Planning](snapshots/image%20copy%203.png)
 ```
 
 ---
