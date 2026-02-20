@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, NavLink, useNavigate } from "react-router-dom";
 import { User, BarChart3, Search, Calendar as CalendarIcon, LogOut } from "lucide-react";
 import "./index.css";
@@ -19,25 +19,15 @@ const NAV = [
 
 /* ── Protected layout with sidebar ── */
 function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, profile, setProfile, nutrition, setNutrition } = useAuth();
   const navigate = useNavigate();
-
-  const [profile, setProfile] = useState(() => {
-    const saved = localStorage.getItem("nh_profile");
-    return saved ? JSON.parse(saved) : null;
-  });
-
-  const [nutrition, setNutrition] = useState(() => {
-    const saved = localStorage.getItem("nh_nutrition");
-    return saved ? JSON.parse(saved) : null;
-  });
 
   const handleSaveProfile = (p, n) => {
     setProfile(p);
-    localStorage.setItem("nh_profile", JSON.stringify(p));
+    localStorage.setItem("ff_profile", JSON.stringify(p));
     if (n) {
       setNutrition(n);
-      localStorage.setItem("nh_nutrition", JSON.stringify(n));
+      localStorage.setItem("ff_nutrition", JSON.stringify(n));
     }
     navigate("/analytics");
   };
@@ -108,9 +98,9 @@ function AppRoutes() {
         element={
           user
             ? <Navigate to="/profile" replace />
-            : localStorage.getItem("nh_visited")
+            : localStorage.getItem("ff_visited")
               ? <Navigate to="/login" replace />
-              : <LandingPage onEnter={() => { localStorage.setItem("nh_visited", "true"); }} />
+              : <LandingPage onEnter={() => { localStorage.setItem("ff_visited", "true"); }} />
         }
       />
       <Route

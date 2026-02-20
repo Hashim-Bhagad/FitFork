@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
     return null;
   });
   
+  const [profile, setProfile] = useState(() => {
+    const saved = localStorage.getItem("ff_profile");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [nutrition, setNutrition] = useState(() => {
+    const saved = localStorage.getItem("ff_nutrition");
+    return saved ? JSON.parse(saved) : null;
+  });
+  
   const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {
@@ -41,12 +51,14 @@ export const AuthProvider = ({ children }) => {
         const saved = await api.getProfile();
         if (saved.profile) {
           localStorage.setItem("ff_profile", JSON.stringify(saved.profile));
+          setProfile(saved.profile);
         }
         if (saved.nutrition) {
           localStorage.setItem("ff_nutrition", JSON.stringify(saved.nutrition));
+          setNutrition(saved.nutrition);
         }
-      } catch {
-        // Profile not saved yet - that's fine
+      } catch (err) {
+        console.warn("Could not load profile on login:", err);
       }
 
       return res;
@@ -70,11 +82,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("ff_token");
     localStorage.removeItem("ff_profile");
     localStorage.removeItem("ff_nutrition");
+    localStorage.removeItem("ff_visited");
     setUser(null);
+    setProfile(null);
+    setNutrition(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, loading, login, register, logout, 
+      profile, setProfile, nutrition, setNutrition 
+    }}>
       {children}
     </AuthContext.Provider>
   );
