@@ -10,6 +10,18 @@
 
 ---
 
+## 📚 Documentation
+
+For a deep dive into how FitFork works and how to set it up, please refer to our detailed guides:
+
+- [🏗️ **Architecture & RAG Pipeline**](docs/architecture.md)
+- [🚀 **Detailed API Reference**](docs/api.md)
+- [⚙️ **Setup & Installation**](docs/setup.md)
+
+---
+
+---
+
 ## � The Vision: Metabolic Intelligence
 
 Traditional meal planners rely on rigid templates. **FitFork** treats nutrition as a dynamic data problem. By analyzing height, weight, activity levels, and fitness goals (Mifflin-St Jeor accuracy), the system generates a unique caloric and macronutrient fingerprint for every user.
