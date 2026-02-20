@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+.venv/
+venv/
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database / Local Stores
+backend/chroma_store/
+
+# Logs
+*.log
+backend/full_test_out.txt
+backend/test_out.txt
+
+# Large Data Files (don't commit multi-hundred MB files)
+*.jsonl
+
+# IDEs
+.vscode/
+.idea/
+
+# OS specific
+.DS_Store
+Thumbs.db

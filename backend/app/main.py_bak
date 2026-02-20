@@ -1,0 +1,114 @@
+"""
+FastAPI main server for Personal Meal Planner AI.
+Start with: uvicorn main:app --reload --port 8000
+"""
+import random
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+from models import UserProfile, NutritionProfile, RecipeQuery, MealPlanRequest, RecipeResult
+from nutrition import calculate_nutrition_profile
+from rag_engine import rag_engine
+
+app = FastAPI(
+    title="Meal Planner AI",
+    description="Personalized meal planning powered by RAG",
+    version="1.0.0",
+)
+
+# Allow React dev server and any localhost origin
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+def health():
+    try:
+        count = rag_engine.collection_count()
+        return {"status": "ok", "recipes_indexed": count}
+    except Exception as e:
+        return {"status": "degraded", "error": str(e)}
+
+
+@app.post("/user/nutrition", response_model=NutritionProfile)
+def get_nutrition(profile: UserProfile, user_id: str = "default_user"):
+    """Calculate and save user profile to MongoDB."""
+    nutrition = calculate_nutrition_profile(profile)
+    rag_engine.save_user_profile(user_id, profile)
+    return nutrition
+
+
+@app.post("/search", response_model=list[RecipeResult])
+def search_recipes(req: RecipeQuery):
+    """
+    RAG-powered recipe search personalized to the user's profile.
+    Returns top_k relevant recipes.
+    """
+    try:
+        results = rag_engine.search(
+            query=req.query,
+            profile=req.user_profile,
+            top_k=req.top_k,
+        )
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/recipes/{recipe_id}", response_model=RecipeResult)
+def get_recipe(recipe_id: str):
+    """Fetch a single recipe by its ID from the vector store."""
+    recipe = rag_engine.get_recipe_by_id(recipe_id)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return recipe
+
+
+@app.post("/meal-plan")
+def generate_meal_plan(req: MealPlanRequest):
+    """
+    Generate an intelligent meal plan using Gemini + Scaledown + ChromaDB context.
+    """
+    try:
+        query = f"I want a {req.days}-day meal plan with {req.meals_per_day} meals per day."
+        plan_text = rag_engine.generate_meal_plan(
+            query=query,
+            profile=req.user_profile,
+            days=req.days
+        )
+        return {
+            "meal_plan_text": plan_text,
+            "user_profile": req.user_profile
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def _build_meal_queries(profile: UserProfile, nutrition: NutritionProfile, meals_per_day: int) -> dict:
+    """Create meal-specific queries based on the user's goal."""
+    goal = profile.goal
+    per_meal_cal = int(nutrition.target_calories / meals_per_day)
+
+    if meals_per_day == 1:
+        return {
+            "Lunch": f"{goal.replace('_', ' ')} meal around {per_meal_cal} calories",
+        }
+    elif meals_per_day == 2:
+        return {
+            "Breakfast": f"healthy {goal.replace('_', ' ')} breakfast",
+            "Dinner": f"{goal.replace('_', ' ')} dinner around {per_meal_cal} calories",
+        }
+    else:
+        queries = {
+            "Breakfast": f"quick healthy {goal.replace('_', ' ')} breakfast high protein",
+            "Lunch": f"{goal.replace('_', ' ')} lunch meal {per_meal_cal} calories",
+            "Dinner": f"nutritious {goal.replace('_', ' ')} dinner",
+        }
+        if meals_per_day >= 4:
+            queries["Snack"] = f"healthy snack low calorie {goal.replace('_', ' ')}"
+        return queries
