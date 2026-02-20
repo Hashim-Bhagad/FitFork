@@ -31,28 +31,20 @@ The core of FitFork is its **Retrieval-Augmented Generation (RAG)** pipeline, wh
 sequenceDiagram
     participant User
     participant API as FastAPI Backend
-    participant DB as MongoDB
-    participant Vector as ChromaDB
-    participant SD as Scaledown API
-    participant LLM as OpenRouter (Gemini)
+    participant DB as MongoDB (Users/Recipes)
+    participant LLM as Google AI Studio (Gemini 2.5)
 
     User->>API: Generate Meal Plan Request
-    API->>DB: Fetch User Profile (Bio-metrics)
+    API->>DB: Fetch User Profile & Chat History
     API->>API: Calculate Metabolic Requirements
-    API->>API: Augment Query with Constraints
-    API->>Vector: Semantic Search (Top-K Recipes)
-    Vector-->>API: Return Candidate Recipes
-    API->>SD: Compress Context (Token Optimization)
-    SD-->>API: Compressed Prompt
-    API->>LLM: Structured Generation Request
+    API->>API: Augment Query (Text Search)
+    API->>DB: Text Search (Recipes)
+    DB-->>API: Return Candidate Recipes
+    API->>LLM: Structured JSON Generation (Gemini 2.5)
     LLM-->>API: JSON Meal Plan
     API->>User: Interactive Meal Plan UI
 ```
 
-### Context Compression (Scaledown)
+### LLM Gateway (Google AI Studio)
 
-To minimize latency and token costs while maintaining recipe integrity, FitFork uses **Scaledown** technology. This compresses the retrieved recipe metadata into a concentrated context window before sending it to the LLM.
-
-### LLM Gateway (OpenRouter)
-
-We utilize `google/gemini-2.0-flash-001` via OpenRouter. This model provides the perfect balance of speed and complex reasoning required for balancing nutritional macros across a 7-day calendar.
+We utilize the **`google-genai`** SDK to interface directly with **`gemini-2.5-flash`**. This ensures the highest performance, lowest latency, and access to the latest frontier features while maintaining a robust Free Tier for development.

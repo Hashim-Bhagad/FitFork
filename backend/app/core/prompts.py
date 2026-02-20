@@ -53,14 +53,37 @@ Ensure the JSON is perfectly valid and contains no additional text outside the J
 
 def build_augmented_query(query: str, profile: UserProfile, nutrition_profile) -> str:
     """
-    Standardize the augmented query for retrieval.
+    Produce a weighted keyword string for MongoDB text search.
+    Filters out common sentence noise to focus on food keywords.
     """
-    parts = [f"User search: {query}"]
-    parts.append(f"Goal: {profile.goal.replace('_', ' ')}")
-    parts.append(f"Nutrition target: {nutrition_profile.target_calories} kcal")
-    if profile.dietary_restrictions:
-        parts.append(f"Dietary preferences: {', '.join(profile.dietary_restrictions)}")
-    if profile.cuisine_preferences:
-        parts.append(f"Cuisine preferences: {', '.join(profile.cuisine_preferences)}")
+    import re
+    noise_patterns = [
+        r"I want a \d+-day meal plan",
+        r"with \d+ meals per day",
+        r"generate a plan",
+        r"can you make",
+        r"please provide",
+        r"for me"
+    ]
     
-    return "\n".join(parts)
+    clean_query = query
+    for pattern in noise_patterns:
+        clean_query = re.sub(pattern, "", clean_query, flags=re.IGNORECASE)
+    
+    terms = []
+    if clean_query.strip():
+        terms.append(clean_query.strip())
+        
+    # Profile attributes (Goal and Cuisines)
+    terms.append(profile.goal.replace('_', ' '))
+    
+    if profile.cuisine_preferences:
+        terms.extend(profile.cuisine_preferences)
+        
+    # Dietary hints
+    if profile.dietary_restrictions:
+        terms.extend(profile.dietary_restrictions)
+        
+    final_query = " ".join(terms)
+    print(f"DEBUG: [RAG] Augmented Query: {final_query}")
+    return final_query

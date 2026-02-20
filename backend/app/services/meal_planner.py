@@ -1,100 +1,89 @@
 import json
 import requests
 from typing import List, Optional
-from openai import OpenAI
+from google import genai
 from app.core.config import (
-    SCALEDOWN_API_KEY, SCALEDOWN_URL, OPEN_ROUTER_API_KEY, OPENROUTER_URL
+    SCALEDOWN_API_KEY, SCALEDOWN_URL, GEMINI_API_KEY
 )
 from app.core.prompts import build_meal_plan_system_prompt, build_augmented_query
-from app.db.chromadb import chromadb_client
+from app.db.mongodb import mongodb_client
 from app.services.nutrition import calculate_nutrition_profile
 from app.models.schemas import UserProfile, CalendarResponse
 
 class MealPlannerService:
     def __init__(self):
-        self.client = OpenAI(
-            base_url=OPENROUTER_URL,
-            api_key=OPEN_ROUTER_API_KEY,
-        ) if OPEN_ROUTER_API_KEY else None
-        self.model_name = "google/gemini-2.0-flash-001"
+        self.client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+        self.model_name = "gemini-2.5-flash"
 
-    def generate_interactive_meal_plan(self, query: str, profile: UserProfile, days: int = 7) -> CalendarResponse:
+    def generate_interactive_meal_plan(self, query: str, profile: UserProfile, days: int = 7, user_id: str = None) -> CalendarResponse:
         """
-        Full RAG pipeline: Retrieve -> Compress -> Generate Structured JSON via OpenRouter.
+        Orchestrates the RAG-based meal plan generation.
         """
-        # 1. Calculate nutrition needs
-        nutrition = calculate_nutrition_profile(profile)
+        # 1. Broaden the search by augmenting the query
+        nut_profile = calculate_nutrition_profile(profile)
+        search_terms = build_augmented_query(query, profile, nut_profile)
         
-        # 2. Retrieve relevant recipes
-        aug_query = build_augmented_query(query, profile, nutrition)
-        recipes = chromadb_client.search(aug_query, profile, top_k=15)
+        # 2. Find Candidates from MongoDB
+        recipes = mongodb_client.find_recipes(search_terms, profile, limit=40)
         
-        # 3. Build recipe context
-        context_parts = []
-        for r in recipes:
-            context_parts.append(
-                f"ID: {r.id}, Title: {r.title}, Cal: {r.calories}, "
-                f"P: {r.protein_g}g, C: {r.carbs_g}g, F: {r.fat_g}g"
-            )
-        full_context = "\n".join(context_parts)
+        if not recipes:
+             print("DEBUG: [MealPlanner] No recipes found with strict filters, broadening search")
+             recipes = mongodb_client.find_recipes(profile.goal, profile, limit=20)
+
+        # 3. Build Prompts
+        system_prompt = build_meal_plan_system_prompt(profile, nut_profile)
         
-        # 4. Compress context via Scaledown
-        compressed_context = self._compress_prompt(full_context, query)
+        recipe_context = "\n".join([
+            f"- {r['title']} (ID: {str(r['_id'])}): {r.get('calories', 'N/A')} kcal, P: {r.get('protein_g','N/A')}g, C: {r.get('carbs_g','N/A')}g, F: {r.get('fat_g','N/A')}g"
+            for r in recipes
+        ])
+
+        history_text = ""
+        if user_id:
+            chat_history = mongodb_client.get_chat_history(user_id)
+            history_text = "\n".join([f"{h['role']}: {h['content']}" for h in chat_history[-5:]])
+
+        final_prompt = f"""
+        User Request: {query}
+        Available Recipes (Inject these where possible):
+        {recipe_context}
         
-        # 5. Build system and final prompt
-        system_prompt = build_meal_plan_system_prompt(profile, days)
-        final_prompt = f"User Request: {query}\n\nRecipe Context:\n{compressed_context}"
+        Recent Chat Context:
+        {history_text}
         
-        # 6. Generate with OpenRouter
+        Generate a {days}-day plan in JSON format.
+        """
+
+        # 4. Call Gemini (Modern SDK)
         if not self.client:
-            raise Exception("OpenRouter API key missing")
-            
-        response = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": final_prompt}
-            ],
-            response_format={"type": "json_object"}
-        )
-        
-        content = response.choices[0].message.content
-        
-        # ─── DETAILED RAG LOGGING ───
-        print("\n" + "="*50)
-        print("🚀 RAW RAG OUTPUT (OpenRouter JSON)")
-        print("="*50)
-        print(content)
-        print("="*50 + "\n")
-        
-        # 7. Parse and return
-        try:
-            raw_text = content.strip()
-            if raw_text.startswith("```json"):
-                raw_text = raw_text[7:-3].strip()
-            
-            data = json.loads(raw_text)
-            plan_obj = CalendarResponse(**data)
-            plan_obj.nutrition_targets = nutrition
-            return plan_obj
-        except Exception as e:
-            print(f"❌ [MealPlanner] Failed to parse JSON: {e}\nRaw: {content}")
-            raise Exception("Failed to generate a valid interactive meal plan.")
+            raise Exception("Gemini API Key missing")
 
-    def _compress_prompt(self, context: str, prompt: str) -> str:
-        if not SCALEDOWN_API_KEY:
-            return context
-        
-        headers = {'x-api-key': SCALEDOWN_API_KEY, 'Content-Type': 'application/json'}
-        payload = {"context": context, "prompt": prompt, "scaledown": {"rate": "auto"}}
-        
         try:
-            resp = requests.post(SCALEDOWN_URL, headers=headers, json=payload, timeout=10)
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("compressed_prompt", context) if data.get("successful") else context
+            print(f"DEBUG: Calling Gemini with {len(recipes)} candidates")
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=final_prompt,
+                config={
+                    "system_instruction": system_prompt,
+                    "response_mime_type": "application/json"
+                }
+            )
+            
+            # Using response.text to get the JSON string
+            print(f"DEBUG: Gemini Response received: {response.text[:200]}...")
+            plan_data = json.loads(response.text)
+            
+            # Create Pydantic model
+            plan = CalendarResponse(**plan_data)
+            
+            # ENHANCEMENT: Always ensure nutrition_targets is populated
+            if not plan.nutrition_targets:
+                print("DEBUG: Injecting nutrition profile into plan")
+                plan.nutrition_targets = nut_profile
+                
+            return plan
         except Exception as e:
-            print(f"[Scaledown] Error: {e}")
-            return context
+            print(f"DEBUG: Meal Plan Generation Error: {str(e)}")
+            raise e
 
 meal_planner_service = MealPlannerService()

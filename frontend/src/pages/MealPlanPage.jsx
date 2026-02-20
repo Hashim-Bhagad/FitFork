@@ -13,6 +13,7 @@ import {
 export default function MealPlanPage({ profile }) {
   const [plan,      setPlan]      = useState(null);
   const [nutrition, setNutrition] = useState(null);
+  const [plan_overview, setPlanOverview] = useState("");
   const [loading,   setLoading]   = useState(false);
   const [initLoading, setInitLoading] = useState(true);
   const [error,     setError]     = useState("");
@@ -30,6 +31,7 @@ export default function MealPlanPage({ profile }) {
         if (res) {
           setPlan(res.days);
           setNutrition(res.nutrition_targets);
+          setPlanOverview(res.overview || "");
         }
       } catch (err) {
         console.error("Failed to fetch latest plan:", err);
@@ -55,6 +57,7 @@ export default function MealPlanPage({ profile }) {
       }
       setPlan(res.days);
       setNutrition(res.nutrition_targets);
+      setPlanOverview(res.overview || "");
       
       toast({
         title: "Plan Generated!",
@@ -172,6 +175,19 @@ export default function MealPlanPage({ profile }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
+          {/* AI Overview */}
+          {plan_overview && (
+            <div className="card glass-premium mb-6 border-sage/10 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-3 opacity-10"><ChefHat size={40} /></div>
+               <div className="card-title flex items-center gap-2 mb-2 text-sage/80">
+                 <Sparkles size={14} className="text-amber" /> Chef's Note
+               </div>
+               <p className="text-sm leading-relaxed text-cream/90 italic">
+                 "{plan_overview}"
+               </p>
+            </div>
+          )}
+
           {/* Nutrition strip */}
           <div className="card glass-premium" style={{ marginBottom: 22 }}>
             <div className="card-header-flex">

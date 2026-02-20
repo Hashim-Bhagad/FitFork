@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://localhost:8001";
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
+  timeout: 60000, // 60 seconds
 });
 
 // Attach token automatically to every request
@@ -23,7 +24,7 @@ axiosClient.interceptors.response.use(
     if (!error.response) {
       return Promise.reject(
         new Error(
-          "Cannot connect to server. Please make sure the backend is running on port 8000.",
+          "Cannot connect to server. Please make sure the backend is running on port 8001.",
         ),
       );
     }

@@ -96,3 +96,20 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+
+class ChatRequest(BaseModel):
+    message: str
+    user_id: str
+    profile: Optional[UserProfile] = None
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    is_complete: bool = False  # True if the Chef is ready to generate the plan
+    suggested_actions: List[str] = []

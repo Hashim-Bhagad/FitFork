@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, NavLink, useNavigate } from "react-router-dom";
-import { User, BarChart3, Search, Calendar as CalendarIcon, LogOut } from "lucide-react";
+import { User, BarChart3, Search, Calendar as CalendarIcon, LogOut, MessageSquare } from "lucide-react";
 import "./index.css";
 import ProfilePage  from "./pages/ProfilePage";
 import SearchPage   from "./pages/SearchPage";
 import MealPlanPage from "./pages/MealPlanPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import ChefPage      from "./pages/ChefPage";
 import LandingPage  from "./pages/LandingPage";
 import AuthPage     from "./pages/AuthPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -12,6 +13,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 const NAV = [
   { to: "/profile",   icon: <User size={18} />,         label: "My Profile"   },
   { to: "/analytics", icon: <BarChart3 size={18} />,     label: "Insights"     },
+  { to: "/chef",      icon: <MessageSquare size={18} />, label: "Talk to Chef" },
   { to: "/search",    icon: <Search size={18} />,        label: "Find Recipes" },
   { to: "/mealplan",  icon: <CalendarIcon size={18} />,  label: "Meal Plan"    },
 ];
@@ -77,6 +79,7 @@ function DashboardLayout() {
         <Routes>
           <Route path="/profile"   element={<ProfilePage profile={profile} onSave={handleSaveProfile} />} />
           <Route path="/analytics" element={<AnalyticsPage profile={profile} nutritionData={nutrition} onNavigate={(p) => navigate(`/${p}`)} />} />
+          <Route path="/chef"      element={<ChefPage />} />
           <Route path="/search"    element={<SearchPage profile={profile} />} />
           <Route path="/mealplan"  element={<MealPlanPage profile={profile} onNavigate={(p) => navigate(`/${p}`)} />} />
           <Route path="*"          element={<Navigate to="/profile" replace />} />

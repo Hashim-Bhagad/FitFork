@@ -1,18 +1,41 @@
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from app.models.schemas import (
     UserProfile, NutritionProfile, RecipeQuery, RecipeResult, 
-    MealPlanRequest, CalendarResponse, UserCreate, Token, User
+    MealPlanRequest, CalendarResponse, UserCreate, Token, User,
+    ChatRequest, ChatResponse
 )
 from app.services.nutrition import calculate_nutrition_profile
 from app.services.meal_planner import meal_planner_service
+from app.services.chat_service import chat_service
 from app.db.mongodb import mongodb_client
-from app.db.chromadb import chromadb_client
 from app.api.auth import get_password_hash, verify_password, create_access_token, get_current_user
-from typing import List, Optional
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 
+@router.post("/chat/send", response_model=ChatResponse)
+def send_chat_message(req: ChatRequest, current_user: User = Depends(get_current_user)):
+    """Send a message to the Discovery Agent."""
+    try:
+        return chat_service.get_chef_response(
+            user_id=current_user.id,
+            message=req.message,
+            profile=req.profile
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/chat/history", response_model=List[dict])
+def get_chat_history(current_user: User = Depends(get_current_user)):
+    """Fetch recent chat history for the user."""
+    return mongodb_client.get_chat_history(current_user.id)
+
+@router.delete("/chat/clear")
+def clear_chat(current_user: User = Depends(get_current_user)):
+    """Reset the chat session."""
+    mongodb_client.clear_chat_history(current_user.id)
+    return {"status": "cleared"}
 @router.post("/auth/signup", response_model=User)
 def signup(user: UserCreate):
     hashed_pwd = get_password_hash(user.password)
@@ -65,25 +88,31 @@ def get_user_profile(current_user: User = Depends(get_current_user)):
 @router.post("/search", response_model=List[RecipeResult])
 def search_recipes(req: RecipeQuery):
     """
-    RAG-powered recipe search personalized to the user's profile.
+    Personalized recipe search using MongoDB text search + filtering.
     """
     try:
-        results = chromadb_client.search(
+        # We handle mapping from MongoDB docs to RecipeResult
+        recipes = mongodb_client.find_recipes(
             query=req.query,
             profile=req.user_profile,
-            top_k=req.top_k,
+            limit=req.top_k
         )
-        return results
+        return [RecipeResult(**r) for r in recipes]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/recipes/{recipe_id}", response_model=RecipeResult)
 def get_recipe(recipe_id: str):
-    """Fetch a single recipe by its ID."""
-    recipe = chromadb_client.get_recipe_by_id(recipe_id)
-    if not recipe:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    return recipe
+    """Fetch a single recipe by its ID from MongoDB."""
+    from bson import ObjectId
+    try:
+        recipe = mongodb_client.recipes_collection.find_one({"_id": ObjectId(recipe_id)})
+        if not recipe:
+            raise HTTPException(status_code=404, detail="Recipe not found")
+        recipe["id"] = str(recipe.pop("_id"))
+        return RecipeResult(**recipe)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid recipe ID")
 
 @router.post("/meal-plan", response_model=CalendarResponse)
 def generate_meal_plan(req: MealPlanRequest, current_user: User = Depends(get_current_user)):
@@ -95,12 +124,16 @@ def generate_meal_plan(req: MealPlanRequest, current_user: User = Depends(get_cu
         plan = meal_planner_service.generate_interactive_meal_plan(
             query=query,
             profile=req.user_profile,
-            days=req.days
+            days=req.days,
+            user_id=current_user.id
         )
         # Store in MongoDB
         mongodb_client.save_meal_plan(current_user.id, plan.model_dump())
         return plan
     except Exception as e:
+        import traceback
+        print(f"Error in generate_meal_plan: {str(e)}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/meal-plan/latest", response_model=Optional[CalendarResponse])
