@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await api.login(email, password);
-      localStorage.setItem("nh_token", res.access_token);
+      localStorage.setItem("ff_token", res.access_token);
       
       // Fetch real user info from the backend
       let userData;
@@ -40,10 +40,10 @@ export const AuthProvider = ({ children }) => {
       try {
         const saved = await api.getProfile();
         if (saved.profile) {
-          localStorage.setItem("nh_profile", JSON.stringify(saved.profile));
+          localStorage.setItem("ff_profile", JSON.stringify(saved.profile));
         }
         if (saved.nutrition) {
-          localStorage.setItem("nh_nutrition", JSON.stringify(saved.nutrition));
+          localStorage.setItem("ff_nutrition", JSON.stringify(saved.nutrition));
         }
       } catch {
         // Profile not saved yet - that's fine
@@ -67,9 +67,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("fitfork_user");
-    localStorage.removeItem("nh_token");
-    localStorage.removeItem("nh_profile");
-    localStorage.removeItem("nh_nutrition");
+    localStorage.removeItem("ff_token");
+    localStorage.removeItem("ff_profile");
+    localStorage.removeItem("ff_nutrition");
     setUser(null);
   };
 
