@@ -1,88 +1,132 @@
-# FitFork: Personalized AI Culinary Assistant 🥗
+# FitFork: AI-Powered Metabolic Culinary Intelligence 🥗
 
-FitFork is a high-performance, RAG-powered meal planning application that delivers personalized nutrition and culinary inspiration. By combining advanced vector search with state-of-the-art LLMs, FitFork transforms basic user metrics into highly specific, dietary-compliant meal plans.
+[![Project Status: Production](https://img.shields.io/badge/Status-Production-success.svg?style=flat-square)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Built with FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Built with React](https://img.shields.io/badge/Frontend-React-61DAFB.svg?style=flat-square&logo=react)](https://react.dev/)
+[![AI Engine: OpenRouter](https://img.shields.io/badge/AI-OpenRouter_/_Gemini-orange.svg?style=flat-square)](https://openrouter.ai/)
 
-![FitFork Hero](https://lh3.googleusercontent.com/aida/AOfcidUYJPapx9xQKmv-gOdlRvgTQ_EDJ_Ca_7--ur9X549tQGzhoJ8kqzfFsMWjVd4mTHoagfqs1Z4DgQdiGDfGm1jbfdM27VeHxcdsOThJ5CP9CF_b8BJD7HMfIbL3olDcYB-7OdyL-md_uFuqzFsEt_7NWkuar-62Tpc1OMW2l1sGXiO68wHFUJkfsZ76v93feCd4iSWR9BhcWubS21uwMZVGPA_brQns36uwUe5RXjiJyA0dBv5_sloxkDox)
-
-## 🚀 Key Features
-
-- **Personalized RAG Engine**: Custom Retrieval-Augmented Generation pipeline using **ChromaDB** and **OpenRouter (Gemini 2.0 Flash)**.
-- **Dynamic Nutrition Logic**: Automated BMR and TDEE calculations based on Mifflin-St Jeor equation to tailor caloric and macro targets.
-- **Hard Dietary Filtering**: Multi-layer metadata filtering ensures strict adherence to dietary restrictions (Vegetarian, Keto, Paleo, etc.) and allergen avoidance.
-- **Cuisine Reranking**: Intelligently boosts recipes matching your regional and culinary preferences.
-- **Prompt Compression**: Integrated **Scaledown** technology to optimize context window usage and reduce latency.
-- **Premium Interface**: A "Deep Olive & Cream" dark botanical aesthetic built for readability and a premium user experience.
+**FitFork** is a next-generation, RAG-powered culinary assistant designed to bridge the gap between metabolic requirements and professional recipe execution. It transforms complex user metrics into actionable, dietary-compliant meal plans using state-of-the-art vector retrieval and large language models.
 
 ---
 
-## 🛠️ Tech Stack
+## � The Vision: Metabolic Intelligence
 
-### Backend
-
-- **Framework**: FastAPI (Python 3.10+)
-- **Vector Database**: ChromaDB (Semantic Search)
-- **Primary Database**: MongoDB (User Data & Plan History)
-- **AI Integration**: OpenRouter (LLM Gateway), Scaledown (Context Compression)
-
-### Frontend
-
-- **Framework**: Vite + React
-- **Styling**: Tailwind CSS (Custom Dark Botanical Palette)
-- **UI Components**: Shadcn UI, Lucide Icons, Framer Motion
+Traditional meal planners rely on rigid templates. **FitFork** treats nutrition as a dynamic data problem. By analyzing height, weight, activity levels, and fitness goals (Mifflin-St Jeor accuracy), the system generates a unique caloric and macronutrient fingerprint for every user.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🎨 UI & Aesthetics: Deep Olive & Cream
 
-FitFork's RAG pipeline follows a modern "Filter -> Retrieve -> Rerank -> Generate" flow:
-
-1.  **Augmentation**: User search queries are augmented with real-time nutrition targets and profile metadata.
-2.  **Metadata Filtering**: Hard exclusion of allergens and inclusion of dietary tags via ChromaDB metadata.
-3.  **Vector Search**: Semantic retrieval from a database of 1,000+ enriched recipes.
-4.  **Cuisine Reranking**: Results are reranked based on user-defined cuisine preferences.
-5.  **LLM Generation**: OpenRouter serves the final context-aware meal plan in structured JSON format.
-
----
-
-## 🎨 UI Showcase
+FitFork features a **premium dark botanical aesthetic**. Designed for the modern kitchen, the high-contrast "Deep Olive & Cream" palette ensures readability in low-light environments while maintaining a grounded, sophisticated feel.
 
 ```carousel
-![Landing Page](https://lh3.googleusercontent.com/aida/AOfcidUYJPapx9xQKmv-gOdlRvgTQ_EDJ_Ca_7--ur9X549tQGzhoJ8kqzfFsMWjVd4mTHoagfqs1Z4DgQdiGDfGm1jbfdM27VeHxcdsOThJ5CP9CF_b8BJD7HMfIbL3olDcYB-7OdyL-md_uFuqzFsEt_7NWkuar-62Tpc1OMW2l1sGXiO68wHFUJkfsZ76v93feCd4iSWR9BhcWubS21uwMZVGPA_brQns36uwUe5RXjiJyA0dBv5_sloxkDox)
+![Premium Landing Page](https://lh3.googleusercontent.com/aida/AOfcidUYJPapx9xQKmv-gOdlRvgTQ_EDJ_Ca_7--ur9X549tQGzhoJ8kqzfFsMWjVd4mTHoagfqs1Z4DgQdiGDfGm1jbfdM27VeHxcdsOThJ5CP9CF_b8BJD7HMfIbL3olDcYB-7OdyL-md_uFuqzFsEt_7NWkuar-62Tpc1OMW2l1sGXiO68wHFUJkfsZ76v93feCd4iSWR9BhcWubS21uwMZVGPA_brQns36uwUe5RXjiJyA0dBv5_sloxkDox)
 <!-- slide -->
-![Personalized Experience](https://lh3.googleusercontent.com/aida/AOfcidW9oWrPk46cqJkdEK5K6k00wEpZH-UvDsnWLRxg3031tiMzn9DZ0eZdml9uSnrbtqihn3YQevFjtNXjO9Kvpagfh9MUsDOORPbqvBTmF5gpmq6vR5w6LzOuQaOZf-faENL-T9o9fqyGPhIPQGV0NLjPh7WgGGgpbz--kyHLqilBsd_of7SEW5zlFZ4y-Jl090BPqF6HacuFmZrzlYWONFyDtTyq3UuRSQuPkZo6M49k_CpRv1JaL_BT2aO4)
+![Metabolic Profile Management](https://lh3.googleusercontent.com/aida/AOfcidW9oWrPk46cqJkdEK5K6k00wEpZH-UvDsnWLRxg3031tiMzn9DZ0eZdml9uSnrbtqihn3YQevFjtNXjO9Kvpagfh9MUsDOORPbqvBTmF5gpmq6vR5w6LzOuQaOZf-faENL-T9o9fqyGPhIPQGV0NLjPh7WgGGgpbz--kyHLqilBsd_of7SEW5zlFZ4y-Jl090BPqF6HacuFmZrzlYWONFyDtTyq3UuRSQuPkZo6M49k_CpRv1JaL_BT2aO4)
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+## 🏗️ Technical Architecture
+
+FitFork leverages a sophisticated **RAG (Retrieval-Augmented Generation)** pipeline to ensure groundedness and precision.
+
+```mermaid
+graph TD
+    A[User Search + Profile] --> B[Query Augmentation]
+    B --> C{RAG Pipeline}
+    C --> D[ChromaDB Vector Search]
+    C --> E[Hard Metadata Filtering]
+    D --> F[Candidate Retrieval]
+    E --> F
+    F --> G[Cuisine-based Reranking]
+    G --> H[Scaledown Prompt Compression]
+    H --> I[OpenRouter Gemini 2.0 Flash]
+    I --> J[Structured JSON Meal Plan]
+```
+
+### Core AI Components
+
+- **Vector Engine**: ChromaDB handles semantic retrieval from thousands of curated recipes.
+- **Filtering Logic**: Implements hard exclusion of allergens and mandatory inclusion of dietary restrictions (Vegetarian, Vegan, Keto, etc.) at the database level.
+- **Context Optimization**: Uses **Scaledown** technology to compress recipe context, reducing LLM latency and token consumption while preserving culinary detail.
+- **LLM Gateway**: Integrated with **OpenRouter** to leverage `google/gemini-2.0-flash-001` for real-time, interactive generation.
+
+---
+
+## 🛠️ Stack Breakdown
+
+### **Backend (Metabolic Engine)**
+
+- **FastAPI**: Asynchronous, high-performance API layer.
+- **MongoDB**: For persistence of user profiles, authentication, and meal plan history.
+- **ChromaDB**: Native vector store for lightning-fast recipe retrieval.
+- **Pydantic**: Strict data validation for complex nutritional schemas.
+
+### **Frontend (Culinary Experience)**
+
+- **Vite + React**: Modern, lightning-fast rendering engine.
+- **Shadcn UI**: For premium, accessible component architecture.
+- **Framer Motion**: Subtle micro-animations for an alive, interactive interface.
+- **Tailwind CSS**: Custom botanical tokens for a unified design system.
+
+---
+
+## ⚙️ Development Guide
 
 ### Prerequisites
 
 - Python 3.10+
-- Node.js & npm
-- MongoDB Atlas account (or local instance)
+- Node.js 18+
+- MongoDB instance (Local or Atlas)
+- API Keys: OpenRouter, Scaledown (Optional)
 
-### Backend Setup
+### Backend Initialization
 
-1. `cd backend`
-2. `python -m venv venv`
-3. `source venv/bin/activate` # On Windows: `.\venv\Scripts\activate`
-4. `pip install -r requirements.txt`
-5. Create a `.env` file based on `.env.example`.
-6. `uvicorn app.main:app --reload`
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env      # Configure your environment variables
+uvicorn app.main:app --reload
+```
 
-### Frontend Setup
+### Frontend Initialization
 
-1. `cd frontend`
-2. `npm install`
-3. `npm run dev`
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## � API Overview (Summary)
+
+| Endpoint          | Method | Purpose                                        |
+| :---------------- | :----- | :--------------------------------------------- |
+| `/auth/signup`    | POST   | Resident registration with hashed credentials. |
+| `/user/nutrition` | POST   | Calculate BMR/TDEE and persist profile.        |
+| `/search`         | POST   | Personalized RAG recipe retrieval.             |
+| `/meal-plan`      | POST   | Generate full interactive calendar plan.       |
+| `/health`         | GET    | System integrity check.                        |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **Phase 4**: In-app Grocery List generator based on weekly recipes.
+- [ ] **Phase 5**: Real-time pantry tracking via image recognition.
+- [ ] **Phase 6**: Integration with wearable health data (Apple Health/Google Fit).
 
 ---
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Built with ❤️ for culinary enthusiasts and health-conscious eaters.**
+**FitFork** is built to empower individuals to take control of their nutrition without sacrificing the joy of professional-grade cooking. 🌿🍔
