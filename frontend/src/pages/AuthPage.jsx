@@ -41,10 +41,10 @@ export default function AuthPage() {
         <div className="auth-header">
           <div className="auth-logo">
             <Leaf size={28} className="accent-text" />
-            <span>NutriMind</span>
+            <span>FitFork</span>
           </div>
           <h2>{isLogin ? "Welcome back" : "Create account"}</h2>
-          <p>{isLogin ? "Sign in to access your culinary insights" : "Join NutriMind for metabolic intelligence"}</p>
+          <p>{isLogin ? "Sign in to access your culinary insights" : "Join FitFork for metabolic intelligence"}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

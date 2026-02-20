@@ -49,7 +49,7 @@ function DashboardLayout() {
       {/* ── Sidebar ── */}
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="sidebar-title">NutriMind</div>
+          <div className="sidebar-title">FitFork</div>
           <div className="sidebar-sub">Personal Meal Planner</div>
         </div>
 

@@ -29,7 +29,7 @@ export default function LandingPage({ onEnter }) {
       <nav className="landing-nav">
         <div className="auth-logo">
           <Leaf size={24} className="accent-text" />
-          <span>NutriMind</span>
+          <span>FitFork</span>
         </div>
         <div className="nav-links">
           <span>Vision</span>
@@ -55,7 +55,7 @@ export default function LandingPage({ onEnter }) {
         </motion.h1>
         
         <motion.p variants={item} className="hero-sub">
-          NutriMind uses advanced RAG-engine semantic retrieval to align thousands of professional recipes 
+          FitFork uses advanced RAG-engine semantic retrieval to align thousands of professional recipes 
           with your unique metabolic profile. Precision meal planning, reimagined for the modern kitchen.
         </motion.p>
         
@@ -114,12 +114,12 @@ export default function LandingPage({ onEnter }) {
       {/* Comparison */}
       <section className="comp-section">
         <div className="comp-card glass">
-          <h2 className="serif">Why NutriMind?</h2>
+          <h2 className="serif">Why FitFork?</h2>
           <div className="comp-table">
             <div className="comp-row head">
               <div className="comp-label">Feature</div>
               <div className="comp-val">Generic Trackers</div>
-              <div className="comp-val highlight">NutriMind AI</div>
+              <div className="comp-val highlight">FitFork AI</div>
             </div>
             {[
               { label: "Recipe Retrieval", old: "Keyword Search", new: "Semantic RAG Engine" },
@@ -138,7 +138,7 @@ export default function LandingPage({ onEnter }) {
       </section>
 
       <footer className="landing-footer">
-        <p>© 2026 NutriMind. Forging the future of metabolic culinary intelligence.</p>
+        <p>© 2026 FitFork. Forging the future of metabolic culinary intelligence.</p>
       </footer>
     </div>
   );

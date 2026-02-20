@@ -5,12 +5,12 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("nutrimind_user");
+    const storedUser = localStorage.getItem("fitfork_user");
     if (storedUser) {
       try {
         return JSON.parse(storedUser);
       } catch {
-        localStorage.removeItem("nutrimind_user");
+        localStorage.removeItem("fitfork_user");
       }
     }
     return null;
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
         userData = { id: "current", email, name: email.split("@")[0] };
       }
 
-      localStorage.setItem("nutrimind_user", JSON.stringify(userData));
+      localStorage.setItem("fitfork_user", JSON.stringify(userData));
       setUser(userData);
 
       // Load saved profile + nutrition from MongoDB
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("nutrimind_user");
+    localStorage.removeItem("fitfork_user");
     localStorage.removeItem("nh_token");
     localStorage.removeItem("nh_profile");
     localStorage.removeItem("nh_nutrition");

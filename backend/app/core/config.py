@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # App Settings
-APP_NAME = "Meal Planner AI"
+APP_NAME = "FitFork"
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # ChromaDB Config
