@@ -8,7 +8,7 @@ def test_live_endpoint():
     # We need a token or we can mock/bypass for local test if we find a way
     # But signup/login first is easier
     
-    auth_url = "http://localhost:8000/auth/signup"
+    auth_url = "http://localhost:8001/auth/signup"
     user_data = {
         "email": "tester@example.com",
         "password": "password123",

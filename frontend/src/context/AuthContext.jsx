@@ -82,7 +82,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("ff_token");
     localStorage.removeItem("ff_profile");
     localStorage.removeItem("ff_nutrition");
-    localStorage.removeItem("ff_visited");
     setUser(null);
     setProfile(null);
     setNutrition(null);

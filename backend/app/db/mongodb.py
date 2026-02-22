@@ -36,6 +36,7 @@ class MongoDBClient:
             self.chat_collection.delete_many({"user_id": user_id})
 
     # --- USER METHODS ---
+    def create_user(self, user_data: dict):
         if self.users_collection is not None:
             # Check if user exists
             if self.users_collection.find_one({"email": user_data["email"]}):

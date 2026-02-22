@@ -6,7 +6,11 @@ import featDiscovery from "../assets/feat-discovery.jpg";
 import featBalance from "../assets/feat-balance.jpg";
 import featLogic from "../assets/feat-logic.jpg";
 
-export default function LandingPage({ onEnter }) {
+import { useNavigate } from "react-router-dom";
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+  
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -34,7 +38,7 @@ export default function LandingPage({ onEnter }) {
         <div className="nav-links">
           <span>Vision</span>
           <span>Science</span>
-          <button className="btn-text" onClick={onEnter}>Sign In</button>
+          <button className="btn-text" onClick={() => navigate("/login")}>Sign In</button>
         </div>
       </nav>
 
@@ -46,7 +50,9 @@ export default function LandingPage({ onEnter }) {
         className="hero"
       >
         <motion.div variants={item} className="pill-eyebrow">
-          <Sparkles size={12} />
+          <motion.div initial={{ rotate: 0 }} animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }}>
+            <Sparkles size={12} />
+          </motion.div>
           <span>AI-Driven Metabolic Intelligence</span>
         </motion.div>
         
@@ -60,7 +66,7 @@ export default function LandingPage({ onEnter }) {
         </motion.p>
         
         <motion.div variants={item} className="hero-btns">
-          <button className="btn btn-amber btn-lg" onClick={onEnter}>
+          <button className="btn btn-amber btn-lg" onClick={() => navigate("/login")}>
             Get Started
             <ChevronRight size={18} />
           </button>

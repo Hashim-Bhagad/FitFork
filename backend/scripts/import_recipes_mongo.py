@@ -11,12 +11,12 @@ load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "fitfork")
-RECIPES_FILE = "final_recipes_enriched.jsonl"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+RECIPES_FILE = os.path.join(SCRIPT_DIR, "..", "..", "data", "processed", "final_recipes_enriched.jsonl")
+
 if not os.path.exists(RECIPES_FILE):
-    # Try one level up if run from backend/ or backend/scripts/
-    RECIPES_FILE = os.path.join("..", "final_recipes_enriched.jsonl")
-    if not os.path.exists(RECIPES_FILE):
-         RECIPES_FILE = os.path.join("..", "..", "final_recipes_enriched.jsonl")
+    print(f"❌ Error: {RECIPES_FILE} not found")
+    sys.exit(1)
 
 def import_recipes():
     client = MongoClient(MONGO_URI)

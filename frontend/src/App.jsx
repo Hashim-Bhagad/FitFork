@@ -100,9 +100,7 @@ function AppRoutes() {
         element={
           user
             ? <Navigate to="/profile" replace />
-            : localStorage.getItem("ff_visited")
-              ? <Navigate to="/login" replace />
-              : <LandingPage onEnter={() => { localStorage.setItem("ff_visited", "true"); }} />
+            : <LandingPage />
         }
       />
       <Route
