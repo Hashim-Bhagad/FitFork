@@ -26,6 +26,7 @@ export default function MealPlanPage({ profile }) {
   // Fetch latest plan on mount
   useEffect(() => {
     const fetchLatest = async () => {
+      setInitLoading(true);
       try {
         const res = await api.getLatestMealPlan();
         if (res) {
@@ -35,17 +36,17 @@ export default function MealPlanPage({ profile }) {
         }
       } catch (err) {
         console.error("Failed to fetch latest plan:", err);
-        setError("Could not retrieve your saved meal plan. Please try generating a new one.");
+        // Only set error message if it's not a 404/Null response
+        if (err.message && !err.message.includes("404")) {
+          setError("Could not retrieve your saved meal plan.");
+        }
       } finally {
         setInitLoading(false);
       }
     };
-    if (hasProfile) {
-      fetchLatest();
-    } else {
-      setInitLoading(false);
-    }
-  }, [hasProfile]);
+
+    fetchLatest();
+  }, []);
 
   const generate = async () => {
     if (!hasProfile) return;
@@ -170,7 +171,7 @@ export default function MealPlanPage({ profile }) {
         )}
       </AnimatePresence>
 
-      {!loading && nutrition && plan && Array.isArray(plan) && (
+      {!loading && plan && Array.isArray(plan) && plan.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,39 +190,41 @@ export default function MealPlanPage({ profile }) {
           )}
 
           {/* Nutrition strip */}
-          <div className="card glass-premium" style={{ marginBottom: 22 }}>
-            <div className="card-header-flex">
-              <div className="card-title">⟡ Daily Targets</div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info size={14} className="muted-icon cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="glass-premium border-none text-cream text-[10px] p-2">
-                    <p>Aggregated daily targets based on your metabolic resting rate and goal.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+          {nutrition && (
+            <div className="card glass-premium" style={{ marginBottom: 22 }}>
+              <div className="card-header-flex">
+                <div className="card-title">⟡ Daily Targets</div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info size={14} className="muted-icon cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="glass-premium border-none text-cream text-[10px] p-2">
+                      <p>Aggregated daily targets based on your metabolic resting rate and goal.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="macro-strip stagger">
+                <div className="macro-pill pill-kcal glass-premium border-none">
+                  <span className="macro-val">{Math.round(nutrition.target_calories)}</span>
+                  <span className="macro-lbl">kcal</span>
+                </div>
+                <div className="macro-pill pill-prot glass-premium border-none">
+                  <span className="macro-val">{nutrition.protein_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
+                  <span className="macro-lbl">protein</span>
+                </div>
+                <div className="macro-pill pill-carb glass-premium border-none">
+                  <span className="macro-val">{nutrition.carbs_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
+                  <span className="macro-lbl">carbs</span>
+                </div>
+                <div className="macro-pill pill-fat glass-premium border-none">
+                  <span className="macro-val">{nutrition.fat_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
+                  <span className="macro-lbl">fat</span>
+                </div>
+              </div>
             </div>
-            <div className="macro-strip stagger">
-              <div className="macro-pill pill-kcal glass-premium border-none">
-                <span className="macro-val">{Math.round(nutrition.target_calories)}</span>
-                <span className="macro-lbl">kcal</span>
-              </div>
-              <div className="macro-pill pill-prot glass-premium border-none">
-                <span className="macro-val">{nutrition.protein_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
-                <span className="macro-lbl">protein</span>
-              </div>
-              <div className="macro-pill pill-carb glass-premium border-none">
-                <span className="macro-val">{nutrition.carbs_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
-                <span className="macro-lbl">carbs</span>
-              </div>
-              <div className="macro-pill pill-fat glass-premium border-none">
-                <span className="macro-val">{nutrition.fat_g}<span style={{fontSize:"0.8rem"}}>g</span></span>
-                <span className="macro-lbl">fat</span>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Day rows */}
           <div className="mp-grid">
