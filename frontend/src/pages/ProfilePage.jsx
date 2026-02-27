@@ -82,14 +82,14 @@ export default function ProfilePage({ profile, onSave }) {
       animate={{ opacity: 1 }}
       className="page"
     >
-      <div className="page-eyebrow">Step 1 of 1</div>
+      <div className="page-eyebrow">Personal Architecture</div>
       <motion.h2 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         className="page-title"
       >
-        Your <em>profile</em>
+        Your <em>Biology</em>
       </motion.h2>
       <motion.p 
         initial={{ opacity: 0 }}
@@ -97,7 +97,7 @@ export default function ProfilePage({ profile, onSave }) {
         transition={{ delay: 0.3 }}
         className="page-sub"
       >
-        Tell us about your body and goals. Everything is calculated locally — your data stays on your device.
+        Quantify your body and objectives. Our engine synchronizes these metrics to calculate precise metabolic thresholds.
       </motion.p>
 
       <form onSubmit={submit}>
@@ -139,7 +139,7 @@ export default function ProfilePage({ profile, onSave }) {
           <div className="chips stagger">
             {GOAL_OPTIONS.map(g => (
               <button key={g.value} type="button"
-                className={`chip ${form.goal === g.value ? "on-amber" : ""}`}
+                className={`chip ${form.goal === g.value ? "on-brand" : ""}`}
                 onClick={() => set("goal", g.value)}
               >
                 <span style={{ marginRight: 6, display: 'inline-flex', alignItems: 'center' }}>{g.icon}</span>{g.label}
@@ -152,7 +152,7 @@ export default function ProfilePage({ profile, onSave }) {
           <div className="chips stagger">
             {DIETARY.map(d => (
               <button key={d} type="button"
-                className={`chip ${form.dietary_restrictions.includes(d) ? "on-sage" : ""}`}
+                className={`chip ${form.dietary_restrictions.includes(d) ? "on-mint" : ""}`}
                 onClick={() => toggle("dietary_restrictions", d)}
               >{d}</button>
             ))}
@@ -163,7 +163,7 @@ export default function ProfilePage({ profile, onSave }) {
           <div className="chips stagger">
             {ALLERGENS.map(a => (
               <button key={a} type="button"
-                className={`chip ${form.allergens_to_avoid.includes(a) ? "on-coral" : ""}`}
+                className={`chip ${form.allergens_to_avoid.includes(a) ? "on-peach" : ""}`}
                 onClick={() => toggle("allergens_to_avoid", a)}
               >{a}</button>
             ))}
@@ -174,7 +174,7 @@ export default function ProfilePage({ profile, onSave }) {
           <div className="chips stagger">
             {CUISINES.map(c => (
               <button key={c} type="button"
-                className={`chip ${form.cuisine_preferences.includes(c) ? "on-amber" : ""}`}
+                className={`chip ${form.cuisine_preferences.includes(c) ? "on-brand" : ""}`}
                 onClick={() => toggle("cuisine_preferences", c)}
               >{c}</button>
             ))}
@@ -184,14 +184,14 @@ export default function ProfilePage({ profile, onSave }) {
         {error && <div className="alert alert-warn">⚠ {error}</div>}
 
         <motion.button 
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, boxShadow: "var(--shadow-glow)" }}
           whileTap={{ scale: 0.98 }}
           type="submit" 
-          className="btn btn-amber" 
+          className="btn btn-primary" 
           disabled={loading} 
           style={{ minWidth: 200, marginTop: 24 }}
         >
-          {loading ? "Calculating…" : "Calculate & Save"}
+          {loading ? "Calculating…" : "Analyze Metabolic Baseline"}
         </motion.button>
       </form>
 
@@ -227,13 +227,15 @@ export default function ProfilePage({ profile, onSave }) {
             <span>Goal <strong style={{ color: "var(--amber)" }}>{form.goal.replace(/_/g, " ")}</strong></span>
           </div>
           <div className="divider" style={{ margin: "24px 0" }} />
-          <button 
-            className="btn btn-amber" 
+          <motion.button 
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className="btn btn-primary" 
             onClick={() => onSave({ ...form, height_cm: +form.height_cm, weight_kg: +form.weight_kg, age: +form.age }, nutrition)}
-            style={{ width: "100%" }}
+            style={{ width: "100%", height: 48 }}
           >
-            Go to Insights →
-          </button>
+            Deploy Profile to Cloud →
+          </motion.button>
         </motion.div>
       )}
     </motion.div>

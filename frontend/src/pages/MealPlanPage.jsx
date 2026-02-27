@@ -100,26 +100,27 @@ export default function MealPlanPage({ profile }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="card glass-premium" 
-        style={{ marginBottom: 24, display:"flex", gap:18, alignItems:"flex-end", flexWrap:"wrap" }}
+        style={{ marginBottom: 24, display:"flex", gap:18, alignItems:"center", flexWrap:"wrap", padding: '12px 24px' }}
       >
         <div className="fg" style={{ minWidth: 110 }}>
-          <label>Days</label>
-          <select value={days} onChange={e => setDays(+e.target.value)}>
-            {[1,3,5,7,14].map(d => <option key={d} value={d}>{d} day{d > 1 ? "s" : ""}</option>)}
+          <label className="text-[10px] uppercase tracking-widest text-muted mb-1 block">Timeline</label>
+          <select value={days} onChange={e => setDays(+e.target.value)} className="bg-transparent border-none text-cream focus:ring-0 cursor-pointer">
+            {[1,3,5,7,14].map(d => <option key={d} value={d} className="bg-bg">{d} day{d > 1 ? "s" : ""}</option>)}
           </select>
         </div>
         <div className="fg" style={{ minWidth: 140 }}>
-          <label>Meals / day</label>
-          <select value={mpd} onChange={e => setMpd(+e.target.value)}>
+          <label className="text-[10px] uppercase tracking-widest text-muted mb-1 block">Frequency</label>
+          <select value={mpd} onChange={e => setMpd(+e.target.value)} className="bg-transparent border-none text-cream focus:ring-0 cursor-pointer">
             {[1,2,3,4].map(m => (
-              <option key={m} value={m}>{m} meal{m > 1 ? "s" : ""}{m === 4 ? " + snack" : ""}</option>
+              <option key={m} value={m} className="bg-bg">{m} meal{m > 1 ? "s" : ""}{m === 4 ? " + snack" : ""}</option>
             ))}
           </select>
         </div>
+        <div className="flex-1" />
         <motion.button
-          whileHover={{ scale: 1.02, boxShadow: "var(--glow-amber)" }}
+          whileHover={{ scale: 1.02, boxShadow: "var(--shadow-glow)" }}
           whileTap={{ scale: 0.98 }}
-          className="btn btn-amber"
+          className="btn btn-primary"
           onClick={generate}
           disabled={loading || !hasProfile}
           style={{ minWidth: 160 }}
@@ -130,7 +131,7 @@ export default function MealPlanPage({ profile }) {
             </span>
           ) : (
             <span className="flex items-center gap-2">
-              <Sparkles size={14} /> Generate Plan
+              <Sparkles size={14} /> Optimize Plan
             </span>
           )}
         </motion.button>
@@ -178,15 +179,19 @@ export default function MealPlanPage({ profile }) {
         >
           {/* AI Overview */}
           {plan_overview && (
-            <div className="card glass-premium mb-6 border-sage/10 relative overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="card glass-premium mb-6 border-brand/10 relative overflow-hidden"
+            >
                <div className="absolute top-0 right-0 p-3 opacity-10"><ChefHat size={40} /></div>
-               <div className="card-title flex items-center gap-2 mb-2 text-sage/80">
-                 <Sparkles size={14} className="text-amber" /> Chef's Note
+               <div className="card-title flex items-center gap-2 mb-2 text-brand/80">
+                 <Sparkles size={14} className="text-peach" /> Chef's Note
                </div>
                <p className="text-sm leading-relaxed text-cream/90 italic">
                  "{plan_overview}"
                </p>
-            </div>
+            </motion.div>
           )}
 
           {/* Nutrition strip */}
@@ -241,22 +246,22 @@ export default function MealPlanPage({ profile }) {
                   <div className="day-header">
                     <span className="day-name">Day {dayPlan.day_number}</span>
                     {dayKcal > 0 && (
-                      <span className="day-kcal mono text-amber">≈ {Math.round(dayKcal)} kcal</span>
+                      <span className="day-kcal mono text-brand">≈ {Math.round(dayKcal)} kcal</span>
                     )}
                   </div>
                   <div className="meals-strip">
                     {dayPlan.meals.map((meal, mi) => (
                       <motion.div 
                         key={mi} 
-                        whileHover={{ x: 5 }}
-                        className="meal-slot border-l-2 border-sage/20 hover:border-amber/50 transition-colors"
+                        whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.02)' }}
+                        className="meal-slot border-l-2 border-brand/20 hover:border-brand transition-colors"
                       >
                         <div className="ms-type text-[10px] uppercase tracking-wider text-muted mb-1 flex items-center gap-1">
-                          <CheckCircle2 size={10} className="text-sage" /> {meal.meal_type}
+                          <CheckCircle2 size={10} className="text-brand" /> {meal.meal_type}
                         </div>
                         {meal.recipe_title ? (
                           <>
-                            <div className="ms-title font-semibold text-cream group-hover:text-amber">{meal.recipe_title}</div>
+                            <div className="ms-title font-semibold text-cream group-hover:text-brand">{meal.recipe_title}</div>
                             <div className="ms-cal mono text-[10px] mt-1 opacity-70">
                               {meal.calories ? `${Math.round(meal.calories)} kcal` : ""}
                               {meal.protein_g ? ` · ${meal.protein_g}g prot` : ""}

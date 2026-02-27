@@ -40,7 +40,7 @@ export default function AuthPage() {
       >
         <div className="auth-header">
           <div className="auth-logo">
-            <Leaf size={28} className="accent-text" />
+            <Leaf size={28} style={{ color: "var(--brand)" }} />
             <span>FitFork</span>
           </div>
           <h2>{isLogin ? "Welcome back" : "Create account"}</h2>
@@ -48,7 +48,7 @@ export default function AuthPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="alert alert-warn border-coral/30 mb-4" style={{ fontSize: "0.8rem", padding: "8px 12px" }}>{error}</div>}
+          {error && <div className="alert alert-warn border-peach/30 mb-4" style={{ fontSize: "0.8rem", padding: "8px 12px", background: "var(--peach-glow)", color: "var(--peach-light)" }}>{error}</div>}
           <AnimatePresence mode="wait">
             {!isLogin && (
               <motion.div 

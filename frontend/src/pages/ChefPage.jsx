@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Sparkles, User, Info, MessageSquare, ChevronRight, RefreshCw } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 
 export default function ChefPage() {
@@ -108,43 +109,60 @@ export default function ChefPage() {
   return (
     <div className="page chat-page">
       <div className="discovery-header">
-        <div className="page-eyebrow">Interactive Discovery</div>
-        <div className="page-title">Talk to <em>Chef Discovery</em></div>
-        <div className="page-sub">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="page-eyebrow">Interactive Discovery</motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="page-title">Talk to <em>Chef Discovery</em></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="page-sub">
           Share your cravings, energy levels, and kitchen setup. Our Culinary intelligence synthesizes your details into a bespoke plan.
-        </div>
+        </motion.div>
         
         {/* Permanent Generate Plan button */}
         <div className="header-actions">
-           <button 
-             className={`btn ${isComplete ? 'btn-amber pulse-glow' : 'btn-outline'}`} 
+           <motion.button 
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ delay: 0.3 }}
+             whileHover={{ scale: 1.05 }}
+             whileTap={{ scale: 0.95 }}
+             className={`btn ${isComplete ? 'btn-primary pulse-glow' : 'btn-outline'}`} 
              onClick={() => window.location.href='/mealplan'}
            >
              {isComplete ? '✨ Chef is Ready: Generate Plan' : 'Generate My Plan Anytime'}
-           </button>
+           </motion.button>
         </div>
       </div>
 
       <div className="chat-container glass-premium">
         <div className="chat-messages" ref={scrollRef}>
           {messages.map((m, i) => (
-            <div key={i} className={`chat-bubble-wrap ${m.role}`}>
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, x: m.role === 'user' ? 40 : -40, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className={`chat-bubble-wrap ${m.role}`}
+            >
               <div className="chat-avatar">
                 {m.role === "user" ? <User size={14} /> : <Sparkles size={14} />}
               </div>
-              <div className="chat-bubble">
+              <div className={`chat-bubble ${m.role === 'user' ? 'bubble-user' : 'bubble-bot'} overflow-hidden break-words`}>
                 <div className="chat-content">{m.content}</div>
                 {m.suggestions && m.suggestions.length > 0 && !isComplete && (
-                  <div className="chat-suggestions">
+                  <div className="chat-suggestions flex flex-wrap gap-2 mt-4">
                     {m.suggestions.map((s, si) => (
-                      <button key={si} className="suggestion-pill" onClick={() => handleSend(null, s)}>
+                      <motion.button 
+                        key={si} 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="suggestion-pill" 
+                        onClick={() => handleSend(null, s)}
+                      >
                         {s}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
           {isLoading && (
             <div className="chat-bubble-wrap assistant">
@@ -229,25 +247,30 @@ export default function ChefPage() {
           flex-shrink: 0;
         }
         .user .chat-avatar {
-          background: var(--accent-dark);
-          color: var(--bg);
+          background: var(--brand);
+          color: #0a0b10;
         }
         .chat-bubble {
-          padding: 12px 18px;
+          padding: 12px 20px;
           border-radius: 18px;
           font-size: 0.95rem;
-          line-height: 1.5;
+          line-height: 1.6;
           position: relative;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          max-width: 100%;
         }
         .assistant .chat-bubble {
           background: var(--surface2);
           color: var(--cream);
-          border-bottom-left-radius: 4px;
+          border-bottom-left-radius: 6px;
+          border: 1px solid var(--border);
         }
         .user .chat-bubble {
-          background: var(--accent-light);
-          color: var(--bg);
-          border-bottom-right-radius: 4px;
+          background: var(--brand);
+          color: #0a0b10;
+          border-bottom-right-radius: 6px;
+          font-weight: 500;
         }
         .chat-suggestions {
           display: flex;
@@ -298,8 +321,8 @@ export default function ChefPage() {
           width: 42px;
           height: 42px;
           border-radius: 50%;
-          background: var(--accent-light);
-          color: var(--bg);
+          background: var(--brand);
+          color: #0a0b10;
           border: none;
           display: flex;
           align-items: center;
@@ -360,13 +383,13 @@ export default function ChefPage() {
           justify-content: center;
         }
         .pulse-glow {
-          box-shadow: 0 0 15px var(--amber);
+          box-shadow: 0 0 15px var(--brand);
           animation: pulseGlow 2s infinite;
         }
         @keyframes pulseGlow {
-          0% { box-shadow: 0 0 5px var(--amber); }
-          50% { box-shadow: 0 0 20px var(--amber); }
-          100% { box-shadow: 0 0 5px var(--amber); }
+          0% { box-shadow: 0 0 5px var(--brand); }
+          50% { box-shadow: 0 0 20px var(--brand); }
+          100% { box-shadow: 0 0 5px var(--brand); }
         }
         .chef-status-badge {
           display: flex;

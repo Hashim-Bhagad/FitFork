@@ -31,7 +31,7 @@ class MealPlannerService:
              recipes = mongodb_client.find_recipes(profile.goal, profile, limit=20)
 
         # 3. Build Prompts
-        system_prompt = build_meal_plan_system_prompt(profile, nut_profile)
+        system_prompt = build_meal_plan_system_prompt(profile, nut_profile, days)
         
         recipe_context = "\n".join([
             f"- {r['title']} (ID: {str(r['_id'])}): {r.get('calories', 'N/A')} kcal, P: {r.get('protein_g','N/A')}g, C: {r.get('carbs_g','N/A')}g, F: {r.get('fat_g','N/A')}g"

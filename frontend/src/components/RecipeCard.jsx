@@ -1,3 +1,6 @@
+import { motion } from "framer-motion";
+import { Clock, Star, Utensils } from "lucide-react";
+
 const CUISINE_EMOJIS = {
   Italian:"🍝", Indian:"🍛", Mexican:"🌮", Chinese:"🥢", Japanese:"🍣",
   Thai:"🫙", Mediterranean:"🫒", American:"🍔", French:"🥐",
@@ -9,7 +12,14 @@ export default function RecipeCard({ recipe, index = 0 }) {
   const score = recipe.score != null ? Math.round(recipe.score * 100) : null;
 
   return (
-    <div className="recipe-card" style={{ animationDelay: `${index * 0.06}s` }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ y: -5, boxShadow: "var(--shadow-glow)" }}
+      className="recipe-card glass"
+    >
       <div className="rc-thumb">
         {emoji}
         {score !== null && <span className="rc-score">{score}% match</span>}
@@ -17,10 +27,10 @@ export default function RecipeCard({ recipe, index = 0 }) {
       <div className="rc-body">
         <div className="rc-title">{recipe.title}</div>
         <div className="rc-meta">
-          {recipe.cuisine && <span className="tag tag-amb">{recipe.cuisine}</span>}
-          {recipe.time_minutes > 0 && <span className="tag">⏱ {recipe.time_minutes}m</span>}
+          {recipe.cuisine && <span className="tag tag-brand">{recipe.cuisine}</span>}
+          {recipe.time_minutes > 0 && <span className="tag flex items-center gap-1"><Clock size={10} /> {recipe.time_minutes}m</span>}
           {recipe.dietary_tags?.slice(0, 2).map(d => (
-            <span key={d} className="tag tag-sage">{d}</span>
+            <span key={d} className="tag tag-mint">{d}</span>
           ))}
         </div>
         {recipe.description && (
@@ -46,6 +56,6 @@ export default function RecipeCard({ recipe, index = 0 }) {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

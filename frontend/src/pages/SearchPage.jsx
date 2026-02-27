@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Search, Utensils, AlertCircle } from "lucide-react";
 import { api } from "../api";
 import RecipeCard from "../components/RecipeCard";
 
@@ -37,14 +39,14 @@ export default function SearchPage({ profile }) {
   return (
     <div className="page">
       <div className="page-eyebrow">Recipe Discovery</div>
-      <h2 className="page-title">Find <em>recipes</em></h2>
-      <p className="page-sub">
+      <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="page-title">Find <em>recipes</em></motion.h2>
+      <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="page-sub">
         Ask in plain English — we'll rank results using your nutrition profile, allergens, and cuisine preferences.
-      </p>
+      </motion.p>
 
       {/* Search bar */}
-      <div className="search-wrap">
-        <span style={{ fontSize:"1.15rem", opacity:0.6 }}>⌕</span>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="search-wrap glass">
+        <Search size={18} className="text-muted" />
         <input
           type="text"
           placeholder="e.g. high protein breakfast under 500 calories…"
@@ -53,14 +55,14 @@ export default function SearchPage({ profile }) {
           onKeyDown={e => e.key === "Enter" && search(query)}
         />
         <button
-          className="btn btn-amber"
-          style={{ borderRadius: "var(--r-pill)", padding: "9px 22px" }}
+          className="btn btn-primary"
+          style={{ borderRadius: "var(--r-pill)", padding: "9px 24px" }}
           onClick={() => search(query)}
           disabled={loading || !hasProfile}
         >
-          Search
+          Explore
         </button>
-      </div>
+      </motion.div>
 
       {/* Profile warning */}
       {!hasProfile && (
@@ -88,13 +90,17 @@ export default function SearchPage({ profile }) {
       {loading && <div className="spinner" />}
 
       {!loading && touched && results.length === 0 && (
-        <div style={{ textAlign:"center", padding:"64px 0", color:"var(--muted)" }}>
-          <div style={{ fontSize:"3rem", marginBottom:12 }}>🍽</div>
-          <p style={{ fontFamily:"'Cormorant Garant', serif", fontSize:"1.3rem" }}>No recipes found</p>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ textAlign:"center", padding:"64px 0", color:"var(--muted)" }}
+        >
+          <div style={{ fontSize:"3rem", marginBottom:12 }}><Utensils size={48} className="mx-auto" /></div>
+          <p className="font-heading text-xl">No recipes found</p>
           <p style={{ fontSize:"0.83rem", marginTop:6 }}>
             Try different keywords, or check that the backend is running and data has been ingested.
           </p>
-        </div>
+        </motion.div>
       )}
 
       {!loading && results.length > 0 && (
@@ -103,12 +109,7 @@ export default function SearchPage({ profile }) {
             <div className="section-label" style={{ margin:0 }}>
               {results.length} results for
             </div>
-            <span style={{
-              fontFamily:"'Cormorant Garant', serif",
-              fontStyle:"italic",
-              fontSize:"0.95rem",
-              color:"var(--amber-light)",
-            }}>
+            <span className="font-heading italic font-normal text-brand text-lg">
               "{lastQ}"
             </span>
           </div>

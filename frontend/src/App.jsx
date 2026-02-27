@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate, NavLink, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { User, BarChart3, Search, Calendar as CalendarIcon, LogOut, MessageSquare } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import "./index.css";
 import ProfilePage  from "./pages/ProfilePage";
 import SearchPage   from "./pages/SearchPage";
@@ -9,6 +10,7 @@ import ChefPage      from "./pages/ChefPage";
 import LandingPage  from "./pages/LandingPage";
 import AuthPage     from "./pages/AuthPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import ScrollProgress from "./components/ScrollProgress";
 
 const NAV = [
   { to: "/profile",   icon: <User size={18} />,         label: "My Profile"   },
@@ -21,6 +23,7 @@ const NAV = [
 /* ── Protected layout with sidebar ── */
 function DashboardLayout() {
   const { user, logout, profile, setProfile, nutrition, setNutrition } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const handleSaveProfile = (p, n) => {
@@ -41,7 +44,7 @@ function DashboardLayout() {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="sidebar-title">FitFork</div>
-          <div className="sidebar-sub">Personal Meal Planner</div>
+          <div className="sidebar-sub">Metabolic Intelligence</div>
         </div>
 
         <nav>
@@ -76,14 +79,25 @@ function DashboardLayout() {
 
       {/* ── Main content area ── */}
       <main className="main">
-        <Routes>
-          <Route path="/profile"   element={<ProfilePage profile={profile} onSave={handleSaveProfile} />} />
-          <Route path="/analytics" element={<AnalyticsPage profile={profile} nutritionData={nutrition} onNavigate={(p) => navigate(`/${p}`)} />} />
-          <Route path="/chef"      element={<ChefPage />} />
-          <Route path="/search"    element={<SearchPage profile={profile} />} />
-          <Route path="/mealplan"  element={<MealPlanPage profile={profile} onNavigate={(p) => navigate(`/${p}`)} />} />
-          <Route path="*"          element={<Navigate to="/profile" replace />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            style={{ height: "100%" }}
+          >
+            <Routes>
+              <Route path="/profile"   element={<ProfilePage profile={profile} onSave={handleSaveProfile} />} />
+              <Route path="/analytics" element={<AnalyticsPage profile={profile} nutritionData={nutrition} onNavigate={(p) => navigate(`/${p}`)} />} />
+              <Route path="/chef"      element={<ChefPage />} />
+              <Route path="/search"    element={<SearchPage profile={profile} />} />
+              <Route path="/mealplan"  element={<MealPlanPage profile={profile} onNavigate={(p) => navigate(`/${p}`)} />} />
+              <Route path="*"          element={<Navigate to="/profile" replace />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );
@@ -116,6 +130,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollProgress />
         <AppRoutes />
       </AuthProvider>
     </BrowserRouter>

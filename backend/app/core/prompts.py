@@ -1,7 +1,7 @@
 from app.models.schemas import UserProfile
 from typing import List
 
-def build_meal_plan_system_prompt(profile: UserProfile, days: int) -> str:
+def build_meal_plan_system_prompt(profile: UserProfile, nutrition_profile, days: int) -> str:
     """
     Build a comprehensive system prompt for Gemini to generate structured meal plans.
     """
@@ -17,11 +17,18 @@ USER PROFILE:
 - Dietary Restrictions: {restrictions}
 - Cuisine Preferences: {cuisines}
 
+NUTRITIONAL TARGETS (DAILY):
+- Calories: {nutrition_profile.target_calories} kcal
+- Protein: {nutrition_profile.protein_g}g
+- Carbs: {nutrition_profile.carbs_g}g
+- Fat: {nutrition_profile.fat_g}g
+
 CORE INSTRUCTIONS:
 1. Use ONLY the provided recipe context to select meals.
-2. Ensure nutritional balance according to the user's goal.
+2. Ensure nutritional balance according to the user's goal and targets.
 3. Provide a brief, inspiring overview of the meal plan.
-4. Output the result strictly in the following JSON format for a calendar UI.
+4. Output a FULL {days}-day plan (day 1 to day {days}).
+5. Output the result strictly in the following JSON format for a calendar UI.
 
 JSON STRUCTURE:
 {{
@@ -40,16 +47,25 @@ JSON STRUCTURE:
           "carbs_g": 40.0,
           "fat_g": 15.2
         }},
-        ... (Lunch and Dinner)
+        ... (Include Lunch and Dinner)
       ]
     }},
-    ... (Up to day {days})
-  ]
+    ... (Repeat for ALL {days} days)
+  ],
+  "nutrition_targets": {{
+      "bmr": {nutrition_profile.bmr},
+      "tdee": {nutrition_profile.tdee},
+      "target_calories": {nutrition_profile.target_calories},
+      "protein_g": {nutrition_profile.protein_g},
+      "carbs_g": {nutrition_profile.carbs_g},
+      "fat_g": {nutrition_profile.fat_g}
+  }}
 }}
 
 Ensure the JSON is perfectly valid and contains no additional text outside the JSON block.
 """
     return prompt.strip()
+
 
 def build_augmented_query(query: str, profile: UserProfile, nutrition_profile) -> str:
     """

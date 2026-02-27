@@ -11,15 +11,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 
 const COLORS = {
   protein: "#fb7185", // coral
-  carbs: "#c5d89d",   // sage/accent-light
-  fat: "#9cab84",     // sage/accent
-  bmr: "#353e30",     // surface3
-  activity: "#d97706", // amber
-  target: "#f6f0d7",  // cream
+  carbs: "#80ed99",   // mint
+  fat: "#38a3a5",     // accent-dark
+  bmr: "#222832",     // surface3
+  activity: "#ffb5a7", // peach
+  target: "#f8f9fa",  // cream
 };
 
 export default function AnalyticsPage({ profile, nutritionData, onNavigate }) {
@@ -88,7 +87,7 @@ export default function AnalyticsPage({ profile, nutritionData, onNavigate }) {
             </div>
           </motion.div>
           <motion.div whileHover={{ y: -5 }} className="metric-card glass-premium">
-            <div className="mc-icon" style={{ backgroundColor: "rgba(217, 119, 6, 0.1)" }}><Activity size={18} color="var(--amber)" /></div>
+            <div className="mc-icon" style={{ backgroundColor: "var(--peach-glow)" }}><Activity size={18} color="var(--peach)" /></div>
             <div className="mc-info">
               <span className="mc-label">Maintenance (TDEE)</span>
               <span className="mc-val mono">{Math.round(nutritionData.tdee)} <small>kcal</small></span>
@@ -222,7 +221,7 @@ export default function AnalyticsPage({ profile, nutritionData, onNavigate }) {
            <button className="cta-box glass-premium group" onClick={() => onNavigate("search")}>
               <div className="cta-icon"><TrendingUp size={24} className="group-hover:scale-110 transition-transform" /></div>
               <div className="cta-text">
-                <h3 className="group-hover:text-amber transition-colors">Find Optimized Recipes</h3>
+                <h3 className="group-hover:text-brand transition-colors">Find Optimized Recipes</h3>
                 <p>Browse meals that fit your {Math.round(nutritionData.target_calories / 3)} kcal meal target.</p>
               </div>
               <ChevronRight size={20} className="cta-arrow group-hover:translate-x-1 transition-transform" />
