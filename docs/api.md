@@ -1,73 +1,51 @@
-# API Documentation 🚀
+# API Documentation: FitFork Metabolic API 🚀
 
-The FitFork backend provides a RESTful API built with FastAPI. All endpoints return JSON and require `Content-Type: application/json` unless otherwise specified.
+The FitFork API is a high-performance, asynchronous REST interface designed for metabolic data processing and culinary orchestration.
 
-## Authentication
+## 🔐 Authentication
 
-FitFork uses Bearer Token authentication.
+FitFork implements **OAuth 2.0 with JWT (JSON Web Tokens)**.
 
-- **Endpoint**: `/auth/login` (POST)
-- **Content-Type**: `application/x-www-form-urlencoded`
-- **Fields**: `username` (email), `password`
+### Global Security Behavior
 
-## Endpoints
+- **Stateless Verification**: Every request is verified against a public secret.
+- **Auto-Revocation**: The system implements a frontend interceptor that automatically purges local state upon receiving a `401 Unauthorized` response, ensuring no "zombie sessions" exist after token expiration.
 
-### User Profile & Nutrition
+## 🥗 Core Endpoints
 
-| Endpoint          | Method | Description                                    |
-| :---------------- | :----- | :--------------------------------------------- |
-| `/auth/signup`    | POST   | Register a new user.                           |
-| `/user/me`        | GET    | Get current authenticated user details.        |
-| `/user/profile`   | GET    | Get current user's bio-metric profile.         |
-| `/user/nutrition` | POST   | Calculate/Update metabolic profile (BMR/TDEE). |
+### 1. Metabolic Profiling
 
-### Recipe & Meal Planning (The RAG Core)
+`POST /user/nutrition`
+Input a full biometric profile to calculate and persist metabolic targets.
 
-- **POST `/search`**
-  - **Purpose**: Semantic search for recipes based on a query and user profile restrictions.
-  - **Body**: `{ "query": string, "user_profile": UserProfile, "top_k": int }`
+- **Request Body**:
+  ```json
+  {
+    "weight_kg": 85.5,
+    "height_cm": 182,
+    "age": 28,
+    "gender": "male",
+    "activity_level": "moderate",
+    "goal": "lose_weight"
+  }
+  ```
+- **Response**: Returns calculated BMR, TDEE, and suggested macronutrient splits.
 
-- **POST `/meal-plan`**
-  - **Purpose**: Generates a full interactive meal plan for a specified duration using the RAG pipeline.
-  - **Body**: `{ "user_profile": UserProfile, "days": int, "meals_per_day": int }`
+### 2. RAG Recipe Search
 
-- **GET `/meal-plan/latest`**
-  - **Purpose**: Retrieves the most recently generated meal plan for the user.
+`POST /search`
+Semantic retrieval across the recipe corpus, conditioned by biometric state.
 
-- **GET `/recipes/{id}`**
-  - **Purpose**: Get full details for a specific recipe.
+- **Filtering**: Automatically excludes recipes exceeding per-meal caloric envelopes derived from the user's TDEE.
 
-### Google Calendar Integration
+### 3. Google Calendar Orchestration
 
-| Endpoint                | Method | Description                                            |
-| :---------------------- | :----- | :----------------------------------------------------- |
-| `/auth/google`          | GET    | Get the Google OAuth authorization URL.                |
-| `/auth/google/callback` | GET    | Callback for Google OAuth (exchanges code for tokens). |
-| `/calendar/status`      | GET    | Check if the user's Google Calendar is connected.      |
-| `/calendar/sync`        | POST   | Sync a meal plan to Google Calendar.                   |
-| `/calendar/disconnect`  | DELETE | Remove Google Calendar connection and tokens.          |
+FitFork provides an automated sync layer for meal plans.
 
-### System
+- **OAuth Flow**: `GET /auth/google` returns a sanitized authorization URL.
+- **Sync Logic**: `POST /calendar/sync` pushes structured events to `primary` calendar with metadata including caloric density and macronutrient breakdown.
 
-- **GET `/health`**
-  - **Purpose**: Basic health check.
+## 🧪 System Health
 
-## Data Schemas (Simplified)
-
-### UserProfile
-
-```json
-{
-  "age": 30,
-  "gender": "male",
-  "weight_kg": 80,
-  "height_cm": 180,
-  "activity_level": "moderate",
-  "goal": "lose_weight",
-  "dietary_restrictions": ["vegan", "gluten_free"]
-}
-```
-
-### CalendarResponse
-
-The `/meal-plan` endpoint returns a structured JSON containing a list of days, each with a list of meals, fulfilling the metabolic targets calculated by the system.
+`GET /health`
+Returns system status including MongoDB connection health and LLM provider latency.

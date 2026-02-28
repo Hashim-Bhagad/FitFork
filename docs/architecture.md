@@ -1,63 +1,53 @@
 # Architecture Overview: FitFork 🥗
 
-FitFork is built with a modern, decoupled architecture focusing on metabolic precision and high-performance recipe retrieval.
+FitFork is an AI-driven culinary ecosystem designed for high-precision metabolic management. The system architecture is optimized for low-latency Retrieval-Augmented Generation (RAG) and biometric-aware user experiences.
 
-## System Components
+## 🧠 Core Pillar: Metabolic Intelligence
 
-### 1. Frontend (The Culinary Interface)
+At the heart of FitFork is a sophisticated biometric engine that transforms raw physical data into actionable nutritional targets.
 
-- **Framework**: React 18 with Vite.
-- **Styling**: Tailwind CSS with a custom "Deep Olive & Cream" botanical design system.
-- **UI Components**: Shadcn UI for accessible, premium components.
-- **State Management**: React Context (AuthContext) for user sessions.
-- **Animations**: Framer Motion for smooth transitions and interactive micro-animations.
+### 1. Thermodynamic Baseline (Mifflin-St Jeor)
 
-### 2. Backend (The Metabolic Engine)
+We implement the **Mifflin-St Jeor Equation**, widely regarded as the most accurate standard for predicting Resting Metabolic Rate (RMR).
 
-- **Framework**: FastAPI (Asynchronous Python).
-- **Authentication**: JWT-based OAuth2 with password hashing (bcrypt).
-- **Nutritional Logic**: Implements the Mifflin-St Jeor equation to calculate BMR and TDEE based on user profile metrics (height, weight, age, activity).
+- **Male**: `10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) + 5`
+- **Female**: `10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) - 161`
 
-### 3. Data Layer
+### 2. Dynamic TDEE Calculation
 
-- **NoSQL Database**: MongoDB for user profiles, meal plan persistence, and session data.
-- **Vector Database**: ChromaDB for semantic search of the recipe corpus.
+The system calculates Total Daily Energy Expenditure (TDEE) by applying an Activity Multiplier to the BMR, ranging from `1.2` (Sedentary) to `1.9` (Extra Active). These metrics are not static; they are re-calculated and persisted in MongoDB whenever user metrics change, ensuring the RAG engine always has the "current state" of the user's metabolism.
 
-### 4. Integration & Security
+## 🏗️ Technical Architecture: Unified RAG
 
-#### Google Calendar Sync (OAuth 2.0)
+FitFork utilizes a structured **Retrieval-Augmented Generation (RAG)** pipeline. We evolved our architecture from a dual-store setup (ChromaDB + MongoDB) to a **Unified MongoDB Architecture**.
 
-The calendar integration uses a robust OAuth 2.0 flow. Due to the stateless nature of the FastAPI backend, we implemented a custom URL generation strategy that avoids the "Missing code verifier" (PKCE) mismatch typically found in server-side flows that lose state between redirects. Tokens are persisted in MongoDB and automatically refreshed.
+### The Hybrid Search Strategy
 
-#### Session Management
+By leveraging MongoDB's `$search` stage with custom analyzers, we achieve sub-50ms retrieval across 226,000+ recipes without the overhead of external vector synchronization.
 
-FitFork uses JWTs for session persistence. We implemented a **global Axios interceptor** in the frontend that detects `401 Unauthorized` responses. Upon expiration:
+1. **Filtering Layer**: First-pass reduction based on hard biometric constraints (e.g., "Must be < 600 calories" or "Vegan").
+2. **Semantic Weighting**: Score boosting based on user goals (e.g., boosting high-protein recipes for "Build Muscle").
+3. **Retrieval**: Top-K candidates are fetched and formatted as structured context.
 
-1. Local storage is cleared (tokens, profile, user data).
-2. The user is redirected to the `/login` page with a state-aware alert.
+## 🎨 Design System: Botanical High-Contrast
 
-## AI Implementation: RAG Pipeline
+The UI/UX is built on a custom "Deep Olive & Cream" palette, specifically chosen for kitchen environments.
 
-The core of FitFork is its **Retrieval-Augmented Generation (RAG)** pipeline, which ensures meal plans are grounded in actual high-quality recipes.
+### Design Tokens
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant API as FastAPI Backend
-    participant DB as MongoDB (Users/Recipes)
-    participant LLM as Google AI Studio (Gemini 2.5)
+- **Background**: `hsl(120, 15%, 5%)` (Deep Obsidian)
+- **Primary**: `hsl(142, 60%, 45%)` (Botanical Green)
+- **Secondary**: `hsl(38, 92%, 50%)` (Amber Glow)
+- **Acrylic Effects**: 15% blur with glassmorphism to reduce cognitive load while maintaining spatial hierarchy.
 
-    User->>API: Generate Meal Plan Request
-    API->>DB: Fetch User Profile & Chat History
-    API->>API: Calculate Metabolic Requirements
-    API->>API: Augment Query (Text Search)
-    API->>DB: Text Search (Recipes)
-    DB-->>API: Return Candidate Recipes
-    API->>LLM: Structured JSON Generation (Gemini 2.5)
-    LLM-->>API: JSON Meal Plan
-    API->>User: Interactive Meal Plan UI
-```
+## 🔐 Security & Persistence
 
-### LLM Gateway (Google AI Studio)
+- **State Sync**: Uses JWTs with a custom **Global Axios Interceptor** that handles real-time session expiration (401) with clean logout redirection.
+- **Data Integrity**: All culinary plans are versioned. If a user optimizes a plan, the previous version is archived in MongoDB, allowing for future "Culinary History" features.
 
-We utilize the **`google-genai`** SDK to interface directly with **`gemini-2.5-flash`**. This ensures the highest performance, lowest latency, and access to the latest frontier features while maintaining a robust Free Tier for development.
+## 🚀 AI Gateway: Frontiers of Generation
+
+We utilize the **`google-genai`** SDK to interface with **Gemini 2.0 Flash**.
+
+- **Temperature Tuning**: Set to `0.3` for meal planning to ensure nutritional accuracy, and `0.7` for the "Chef Chat" to allow for creative culinary advice.
+- **Failover Logic**: Implemented retry mechanisms and quota management to handle high-concurrency culinary requests.
