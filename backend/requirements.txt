@@ -10,3 +10,6 @@ passlib[bcrypt]
 python-jose[cryptography]
 python-jwt
 requests
+google-api-python-client
+google-auth
+google-auth-oauthlib

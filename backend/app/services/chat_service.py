@@ -24,7 +24,7 @@ USER DATA:
 class ChatService:
     def __init__(self):
         self.client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-        self.model_name = "gemini-2.5-flash"
+        self.model_name = "gemini-2.5-flash-lite"
 
     def get_chef_response(self, user_id: str, message: str, profile: UserProfile = None) -> ChatResponse:
         # 1. Store user message
@@ -48,6 +48,11 @@ class ChatService:
                 "role": role,
                 "parts": [{"text": h["content"]}]
             })
+        
+        # Gemini requirement: Chat history must start with a 'user' message.
+        # If history starts with the Chef's welcome message, we skip it for the API call.
+        while contents and contents[0]["role"] == "model":
+            contents.pop(0)
 
         # 5. Call Gemini
         if not self.client:
@@ -63,8 +68,22 @@ class ChatService:
             reply = response.text or ""
             print(f"DEBUG: Received reply: {reply[:50]}...")
         except Exception as e:
-            print(f"DEBUG: Gemini Error: {str(e)}")
-            reply = "I'm having a bit of trouble connecting to my culinary database. Could you try that again?"
+            import traceback
+            import datetime
+            error_msg = f"ERROR [{datetime.datetime.now()}]: Gemini API failed: {str(e)}"
+            print(error_msg)
+            
+            # Log full traceback to a dedicated error file
+            with open("gemini_errors.log", "a", encoding="utf-8") as f:
+                f.write(f"\n{'='*50}\n{error_msg}\n")
+                traceback.print_exc(file=f)
+                f.write(f"History state: {contents}\n")
+            
+            reply = f"Gemini API Error: {str(e)}"
+            if "429" in str(e):
+                reply += " (Rate limit or quota exhausted)"
+            elif "404" in str(e):
+                reply += " (Model not found or unsupported)"
         
         # 6. Check for completion token
         is_complete = "[PLAN_READY]" in reply

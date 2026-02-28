@@ -29,15 +29,33 @@ axiosClient.interceptors.response.use(
       );
     }
 
-    const { status, data } = error.response;
+    const { status, data, config } = error.response;
     let msg = `Server error (HTTP ${status})`;
 
-    if (status === 422 && data.detail) {
+    // Handle session expiration (401 Unauthorized)
+    if (status === 401) {
+      // Don't redirect if we're actually trying to login - allow the local catch to handle "Invalid email/password"
+      if (config.url === "/auth/login") {
+        msg = "Invalid email or password.";
+      } else {
+        // Clear auth state and redirect
+        localStorage.removeItem("fitfork_user");
+        localStorage.removeItem("ff_token");
+        localStorage.removeItem("ff_profile");
+        localStorage.removeItem("ff_nutrition");
+
+        // Use window.location for a hard redirect since we're outside a component
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login?expired=true";
+        }
+        return Promise.reject(
+          new Error("Session expired. Please log in again."),
+        );
+      }
+    } else if (status === 422 && data.detail) {
       msg = Array.isArray(data.detail)
         ? data.detail.map((e) => e.msg).join(", ")
         : String(data.detail);
-    } else if (status === 401) {
-      msg = "Invalid email or password.";
     } else if (status === 403) {
       msg = "You are not authorized to perform this action.";
     } else if (status === 400) {
@@ -88,6 +106,20 @@ export const api = {
 
   getLatestMealPlan: () =>
     axiosClient.get("/meal-plan/latest").then((r) => r.data),
+
+  // Google Calendar
+  getGoogleAuthUrl: () => axiosClient.get("/auth/google").then((r) => r.data),
+
+  getCalendarStatus: () =>
+    axiosClient.get("/calendar/status").then((r) => r.data),
+
+  syncToCalendar: (start_date, timezone = "Asia/Kolkata") =>
+    axiosClient
+      .post("/calendar/sync", { start_date, timezone })
+      .then((r) => r.data),
+
+  disconnectCalendar: () =>
+    axiosClient.delete("/calendar/disconnect").then((r) => r.data),
 
   health: () => axiosClient.get("/health").then((r) => r.data),
 };

@@ -23,6 +23,19 @@ FitFork is built with a modern, decoupled architecture focusing on metabolic pre
 - **NoSQL Database**: MongoDB for user profiles, meal plan persistence, and session data.
 - **Vector Database**: ChromaDB for semantic search of the recipe corpus.
 
+### 4. Integration & Security
+
+#### Google Calendar Sync (OAuth 2.0)
+
+The calendar integration uses a robust OAuth 2.0 flow. Due to the stateless nature of the FastAPI backend, we implemented a custom URL generation strategy that avoids the "Missing code verifier" (PKCE) mismatch typically found in server-side flows that lose state between redirects. Tokens are persisted in MongoDB and automatically refreshed.
+
+#### Session Management
+
+FitFork uses JWTs for session persistence. We implemented a **global Axios interceptor** in the frontend that detects `401 Unauthorized` responses. Upon expiration:
+
+1. Local storage is cleared (tokens, profile, user data).
+2. The user is redirected to the `/login` page with a state-aware alert.
+
 ## AI Implementation: RAG Pipeline
 
 The core of FitFork is its **Retrieval-Augmented Generation (RAG)** pipeline, which ensures meal plans are grounded in actual high-quality recipes.

@@ -12,6 +12,10 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Check if we arrived here because of an expired session
+  const urlParams = new URLSearchParams(window.location.search);
+  const isExpired = urlParams.get("expired") === "true";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -48,6 +52,11 @@ export default function AuthPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
+          {isExpired && !error && (
+            <div className="alert alert-info border-amber/30 mb-4" style={{ fontSize: "0.8rem", padding: "8px 12px", background: "rgba(251, 191, 36, 0.1)", color: "var(--amber-light)" }}>
+              Your session has expired. Please sign in again to continue.
+            </div>
+          )}
           {error && <div className="alert alert-warn border-peach/30 mb-4" style={{ fontSize: "0.8rem", padding: "8px 12px", background: "var(--peach-glow)", color: "var(--peach-light)" }}>{error}</div>}
           <AnimatePresence mode="wait">
             {!isLogin && (

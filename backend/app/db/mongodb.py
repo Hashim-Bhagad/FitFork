@@ -96,6 +96,41 @@ class MongoDBClient:
                 return plan
         return None
 
+    # --- GOOGLE CALENDAR TOKEN METHODS ---
+
+    def save_google_tokens(self, user_id: str, tokens: dict):
+        """Store Google OAuth tokens on the user document."""
+        if self.users_collection is not None:
+            from bson import ObjectId
+            print(f"DEBUG: [MongoDB] Saving Google tokens for user_id: {user_id}")
+            try:
+                result = self.users_collection.update_one(
+                    {"_id": ObjectId(user_id)},
+                    {"$set": {"google_tokens": tokens}}
+                )
+                print(f"DEBUG: [MongoDB] Token update result: matched={result.matched_count}, modified={result.modified_count}")
+            except Exception as e:
+                print(f"DEBUG: [MongoDB] Error saving tokens: {str(e)}")
+
+    def get_google_tokens(self, user_id: str) -> Optional[dict]:
+        """Retrieve stored Google OAuth tokens for the user."""
+        if self.users_collection is not None:
+            from bson import ObjectId
+            user = self.users_collection.find_one({"_id": ObjectId(user_id)})
+            if user:
+                return user.get("google_tokens")
+        return None
+
+    def delete_google_tokens(self, user_id: str):
+        """Remove Google tokens (disconnect Google account)."""
+        if self.users_collection is not None:
+            from bson import ObjectId
+            self.users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$unset": {"google_tokens": ""}}
+            )
+
+
     # --- RECIPE METHODS ---
 
     def create_recipe_indexes(self):

@@ -65,7 +65,9 @@ graph TD
 - **Retrieval Engine**: MongoDB with specialized text indexes for high-speed culinary search across 226k+ recipes.
 - **Biometric Alignment**: Automated macros calculation based on Mifflin-St Jeor equation integrated directly into the retrieval flow.
 - **Unified RAG**: A consolidated MongoDB architecture replacing legacy vector stores for lower latency and simplified data consistency.
-- **LLM Gateway**: Native integration with **Google AI Studio** using the modern `google-genai` SDK for frontier-level reasoning with **Gemini 2.5 Flash**.
+- **LLM Gateway**: Native integration with **Google AI Studio** using the modern `google-genai` SDK for frontier-level reasoning with **Gemini 2.0 Flash**.
+- **Google Calendar Sync**: Native integration with Google OAuth 2.0 to push meal plans directly to your schedule with custom branding and nutritional metadata.
+- **Session Security**: Intelligent 401 detection and automatic redirect logic to maintain system integrity when tokens expire.
 
 ---
 

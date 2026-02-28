@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -143,3 +144,87 @@ def get_latest_meal_plan(current_user: User = Depends(get_current_user)):
     if not plan_data:
         return None
     return CalendarResponse(**plan_data)
+
+
+# ── Google Calendar Integration ──────────────────────────
+
+from fastapi.responses import RedirectResponse
+from app.services.google_calendar import get_auth_url, exchange_code, sync_meal_plan
+from app.core.config import FRONTEND_URL
+
+
+@router.get("/auth/google")
+def google_auth_start(current_user: User = Depends(get_current_user)):
+    """Return the Google OAuth consent URL. The user's JWT is passed as state."""
+    token = None
+    # We pass the user's JWT in state so the callback knows who authorized
+    from fastapi import Request
+    auth_url = get_auth_url(state=current_user.id)
+    return {"auth_url": auth_url}
+
+
+@router.get("/auth/google/callback")
+def google_auth_callback(code: str, state: str = ""):
+    """
+    Google redirects here after the user approves.
+    Exchange the code for tokens, store them, and redirect to the frontend.
+    """
+    try:
+        if not state:
+            print("Google OAuth error: missing state (user_id)")
+            return RedirectResponse(url=f"{FRONTEND_URL}/mealplan?google=error&detail=Missing user context (state)")
+
+        tokens = exchange_code(code)
+        mongodb_client.save_google_tokens(state, tokens)
+        print(f"Google Calendar successfully connected for user: {state}")
+        
+        return RedirectResponse(url=f"{FRONTEND_URL}/mealplan?google=connected")
+    except Exception as e:
+        import traceback
+        print(f"Google OAuth error: {str(e)}")
+        traceback.print_exc()
+        return RedirectResponse(url=f"{FRONTEND_URL}/mealplan?google=error&detail={str(e)}")
+
+
+@router.get("/calendar/status")
+def calendar_status(current_user: User = Depends(get_current_user)):
+    """Check if the user has connected their Google Calendar."""
+    tokens = mongodb_client.get_google_tokens(current_user.id)
+    return {"connected": tokens is not None}
+
+
+@router.post("/calendar/sync")
+def sync_to_calendar(
+    req: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Sync the user's latest meal plan to Google Calendar.
+    Expects: { "start_date": "2026-03-01", "timezone": "Asia/Kolkata" }
+    """
+    tokens = mongodb_client.get_google_tokens(current_user.id)
+    if not tokens:
+        raise HTTPException(status_code=400, detail="Google Calendar not connected. Please connect first.")
+
+    plan_data = mongodb_client.get_latest_meal_plan(current_user.id)
+    if not plan_data:
+        raise HTTPException(status_code=404, detail="No meal plan found. Generate one first.")
+
+    start_date = req.get("start_date")
+    if not start_date:
+        raise HTTPException(status_code=400, detail="start_date is required (e.g. '2026-03-01').")
+
+    timezone = req.get("timezone", "Asia/Kolkata")
+
+    try:
+        result = sync_meal_plan(tokens, plan_data, start_date, timezone)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to sync: {str(e)}")
+
+
+@router.delete("/calendar/disconnect")
+def disconnect_google(current_user: User = Depends(get_current_user)):
+    """Remove stored Google Calendar tokens."""
+    mongodb_client.delete_google_tokens(current_user.id)
+    return {"status": "disconnected"}

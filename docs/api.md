@@ -37,6 +37,16 @@ FitFork uses Bearer Token authentication.
 - **GET `/recipes/{id}`**
   - **Purpose**: Get full details for a specific recipe.
 
+### Google Calendar Integration
+
+| Endpoint                | Method | Description                                            |
+| :---------------------- | :----- | :----------------------------------------------------- |
+| `/auth/google`          | GET    | Get the Google OAuth authorization URL.                |
+| `/auth/google/callback` | GET    | Callback for Google OAuth (exchanges code for tokens). |
+| `/calendar/status`      | GET    | Check if the user's Google Calendar is connected.      |
+| `/calendar/sync`        | POST   | Sync a meal plan to Google Calendar.                   |
+| `/calendar/disconnect`  | DELETE | Remove Google Calendar connection and tokens.          |
+
 ### System
 
 - **GET `/health`**

@@ -37,9 +37,23 @@ DB_NAME=fitfork
 OPEN_ROUTER_API_KEY=your_key_here
 SCALEDOWN_API_KEY=your_key_here  # Optional
 JWT_SECRET=your_random_secret
+
+# Google Calendar (Google Cloud Console)
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8001/auth/google/callback
 ```
 
-### Run Backend
+### 3. Google Cloud Console Setup (Required for Sync)
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project and enable the **Google Calendar API**.
+3. Configure the **OAuth Consent Screen** (Internal or External/Testing).
+4. Create **OAuth 2.0 Client IDs** (Web application).
+5. Add `http://localhost:8001/auth/google/callback` to the **Authorized redirect URIs**.
+6. Copy the Client ID and Secret to your `.env` file.
+
+## 4. Run Backend
 
 ```bash
 uvicorn app.main:app --reload
