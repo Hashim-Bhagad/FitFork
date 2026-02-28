@@ -43,35 +43,51 @@ FitFork features a **premium dark botanical aesthetic**. Designed for the modern
 
 ---
 
-## 🏗️ Technical Architecture
+---
 
-FitFork leverages a sophisticated **RAG (Retrieval-Augmented Generation)** pipeline to ensure groundedness and precision.
+## 🏗️ System Architecture
+
+Our solution is built on a high-concurrency, biometric-aware architecture that unifies nutrition science with modern retrieval-augmented generation in a high-contrast **Nano Banana** aesthetic.
 
 ```mermaid
 graph TD
-    A[User Search + Profile] --> B[Query Augmentation]
-    B --> C{RAG Pipeline}
-    C --> D[MongoDB Text Search]
-    C --> E[Bio-metric Filtering]
-    D --> F[Candidate Retrieval]
-    E --> F
-    F --> G[Chef Context Construction]
-    G --> H[Gemini 2.5 Flash]
-    H --> I[Structured JSON Meal Plan]
+    %% User Interaction
+    U[User] -->|Biometrics / Preferences| F[React Frontend]
+    F -->|Secure JWT Auth| B[FastAPI Backend]
+
+    %% Metabolic Engine
+    subgraph "Metabolic Engine (Nano Banana Core)"
+        B -->|Mifflin-St Jeor| M[BMR/TDEE Processor]
+        M -->|Caloric Envelope| P[Prompt Orchestrator]
+    end
+
+    %% Unified RAG Pipeline
+    subgraph "Unified RAG Store"
+        P -->|Semantic Query| DB[(MongoDB Vector Store)]
+        DB -->|Biometric-Filtered Recipes| P
+    end
+
+    %% Intelligence Layer
+    P -->|Seeded Context| AI[Gemini 2.0 Flash]
+    AI -->|JSON Meal Plan| B
+
+    %% Calendar Sync
+    B -->|OAuth 2.0| GCal[Google Calendar API]
+    GCal -->|Sync Events| U
+
+    %% Styling (Nano Banana High-Contrast)
+    style U fill:#f9f9f9,stroke:#FFD700,stroke-width:3px
+    style F fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff
+    style B fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff
+    style DB fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff
+    style AI fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff
+    style GCal fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff
+
+    style M fill:#FFD700,stroke:#333,color:#333
+    style P fill:#FFD700,stroke:#333,color:#333
 ```
 
-### Core AI Components
-
-- **Retrieval Engine**: MongoDB with specialized text indexes for high-speed culinary search across 226k+ recipes.
-- **Biometric Alignment**: Automated macros calculation based on Mifflin-St Jeor equation integrated directly into the retrieval flow.
-- **Unified RAG**: A consolidated MongoDB architecture replacing legacy vector stores for lower latency and simplified data consistency.
-- **LLM Gateway**: Native integration with **Google AI Studio** using the modern `google-genai` SDK for frontier-level reasoning with **Gemini 2.0 Flash**.
-- **Google Calendar Sync**: Native integration with Google OAuth 2.0 to push meal plans directly to your schedule with custom branding and nutritional metadata.
-- **Session Security**: Intelligent 401 detection and automatic redirect logic to maintain system integrity when tokens expire.
-
 ---
-
-## 🛠️ Stack Breakdown
 
 ### **Backend (Metabolic Engine)**
 
