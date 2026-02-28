@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>FitFork Architecture - Nano Banana Theme</title>
+    <style>
+      body {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: "Inter", sans-serif;
+      }
+      .container {
+        background-color: #2a2a2a;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border: 1px solid #ffd700;
+        text-align: center;
+      }
+      h1 {
+        color: #ffd700;
+        margin-bottom: 30px;
+      }
+      .mermaid {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>FitFork System Architecture (Nano Banana)</h1>
+      <div class="mermaid">
+        %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':
+        '#333333', 'primaryTextColor': '#ffffff', 'primaryBorderColor':
+        '#FFD700', 'lineColor': '#FFD700', 'secondaryColor': '#FFE0B2',
+        'tertiaryColor': '#FFD700', 'clusterBkg':'#1e1e1e',
+        'clusterBorder':'#FFD700'}}}%% graph TD %% User Interaction U[User]
+        -->|Biometrics / Preferences| F[React Frontend] F -->|Secure JWT Auth|
+        B[FastAPI Backend] %% Metabolic Engine subgraph "Metabolic Engine (Nano
+        Banana Core)" B -->|Mifflin-St Jeor| M[BMR/TDEE Processor] M -->|Caloric
+        Envelope| P[Prompt Orchestrator] end %% Unified RAG Pipeline subgraph
+        "Unified RAG Store" P -->|Semantic Query| DB[(MongoDB Vector Store)] DB
+        -->|Biometric-Filtered Recipes| P end %% Intelligence Layer P -->|Seeded
+        Context| AI[Gemini 2.0 Flash] AI -->|JSON Meal Plan| B %% Calendar Sync
+        B -->|OAuth 2.0| GCal[Google Calendar API] GCal -->|Sync Events| U %%
+        Styling (Nano Banana High-Contrast) style U
+        fill:#f9f9f9,stroke:#FFD700,stroke-width:3px,color:#333 style F
+        fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff style B
+        fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff style DB
+        fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff style AI
+        fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff style GCal
+        fill:#333,stroke:#FFD700,stroke-width:2px,color:#fff style M
+        fill:#FFD700,stroke:#333,color:#333 style P
+        fill:#FFD700,stroke:#333,color:#333
+      </div>
+    </div>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+  </body>
+</html>
