@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Send, Sparkles, User, Info, MessageSquare, ChevronRight, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
+import { BASE_URL } from "../api";
 
 export default function ChefPage() {
   const { profile, user } = useAuth();
@@ -25,7 +26,7 @@ export default function ChefPage() {
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem("ff_token");
-      const res = await fetch(`http://localhost:8001/chat/history`, {
+      const res = await fetch(`${BASE_URL}/chat/history`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -55,7 +56,7 @@ export default function ChefPage() {
 
     try {
       const token = localStorage.getItem("ff_token");
-      const res = await fetch("http://localhost:8001/chat/send", {
+      const res = await fetch(`${BASE_URL}/chat/send`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -92,7 +93,7 @@ export default function ChefPage() {
     if (!window.confirm("Clear conversation history?")) return;
     try {
       const token = localStorage.getItem("ff_token");
-      await fetch("http://localhost:8001/chat/clear", {
+      await fetch(`${BASE_URL}/chat/clear`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
