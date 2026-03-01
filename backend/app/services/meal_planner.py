@@ -13,7 +13,7 @@ from app.models.schemas import UserProfile, CalendarResponse
 class MealPlannerService:
     def __init__(self):
         self.client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-        self.model_name = "gemini-1.5-flash-latest"
+        self.model_name = "gemini-2.5-flash"
 
     def generate_interactive_meal_plan(self, query: str, profile: UserProfile, days: int = 7, user_id: str = None) -> CalendarResponse:
         """
@@ -34,7 +34,7 @@ class MealPlannerService:
         system_prompt = build_meal_plan_system_prompt(profile, nut_profile, days)
         
         recipe_context = "\n".join([
-            f"- {r['title']} (ID: {str(r['_id'])}): {r.get('calories', 'N/A')} kcal, P: {r.get('protein_g','N/A')}g, C: {r.get('carbs_g','N/A')}g, F: {r.get('fat_g','N/A')}g"
+            f"- {r['title']} (ID: {str(r.get('id', r.get('_id', 'unknown')))}): {r.get('calories', 'N/A')} kcal, P: {r.get('protein_g','N/A')}g, C: {r.get('carbs_g','N/A')}g, F: {r.get('fat_g','N/A')}g"
             for r in recipes
         ])
 
